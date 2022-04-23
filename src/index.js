@@ -53,7 +53,7 @@ class Game extends React.Component {
     for(const hand of allHand) {
       score += Number(Object.keys(hand))
 
-      if (Number(Object.keys(hand)) === 11 && score > 21) {
+      if (score > 21 && Number(Object.keys(hand)) === 11) {
         score -= 10
       }
     }
