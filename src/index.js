@@ -55,20 +55,24 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <div className="dealer">
-            <div>Dealer: { dealerScore }</div>
-            {
-              this.state.dealerHand.map((hand) => {
-                return String.fromCodePoint(Object.values(hand))
-              })
-            }
+            <div className="dealer-score">Dealer: { dealerScore }</div>
+            <div className="dealer-hand">
+              {
+                this.state.dealerHand.map((hand) => {
+                  return String.fromCodePoint(Object.values(hand))
+                })
+              }
+            </div>
           </div>
           <div className="player">
-            <div>Player: { playerScore }</div>
-            {
-              this.state.playerHand.map((hand) => {
-                return String.fromCodePoint(Object.values(hand))
-              })
-            }
+            <div className="player-score">Player: { playerScore }</div>
+            <div className="player-hand">
+              {
+                this.state.playerHand.map((hand) => {
+                  return String.fromCodePoint(Object.values(hand))
+                })
+              }
+            </div>
           </div>
         </div>
       </div>
