@@ -53,16 +53,27 @@ class Game extends React.Component {
   calculateScore(allHand) {
     const sortHand = JSON.parse(JSON.stringify(allHand)).sort((a,b) => sortKeys(a, b))
 
-    let score = 0
+    let totalScore = 0
+
+    let aceCount = 0
 
     for(const hand of sortHand) {
-      score += Number(Object.keys(hand))
+      const score = Number(Object.keys(hand))
+      totalScore += score
 
-      if (score > 21 && Number(Object.keys(hand)) === 11) {
-        score -= 10
+      if (score === 11) {
+        aceCount++
+
+        if (totalScore > 21) {
+          totalScore -= 10
+          aceCount--
+        }
       }
     }
-    return score
+
+    if (aceCount !== 0 && totalScore > 21 ) { totalScore -= 10 }
+
+    return totalScore
   }
 
   hitAction(playerScore) {
