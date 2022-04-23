@@ -33,16 +33,19 @@ class Game extends React.Component {
     const playerCard2 = this.state.deck.splice(randomNumber(0, 51), 1)[0]
     const dealerCard2 = this.state.deck.splice(randomNumber(0, 51), 1)[0]
 
+    const playerHand = Number(Object.keys(playerCard1)) + Number(Object.keys(playerCard2))
+    const dealerHand = Number(Object.keys(dealerCard1)) + Number(Object.keys(dealerCard2))
+
     return (
       <div className="game">
         <div className="game-board">
           <div className="dealer">
-            <div>Dealer: </div>
+            <div>Dealer: { dealerHand }</div>
             { String.fromCodePoint(Object.values(dealerCard1)) }
             { String.fromCodePoint(Object.values(dealerCard2)) }
           </div>
           <div className="player">
-            <div>Player: </div>
+            <div>Player: { playerHand }</div>
             { String.fromCodePoint(Object.values(playerCard1)) }
             { String.fromCodePoint(Object.values(playerCard2)) }
           </div>
