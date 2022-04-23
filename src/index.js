@@ -80,7 +80,16 @@ class Game extends React.Component {
               >
                 Hit
               </button>
-              <button className="stay-button">Stay</button>
+              <button
+                className="stay-button"
+                onClick={() => {
+                  if (dealerScore < 17) {
+                    this.setState({ dealerHand: this.state.dealerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1)) })
+                  }
+                }}
+              >
+                Stay
+              </button>
             </div>
           </div>
         </div>
