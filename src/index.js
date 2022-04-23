@@ -74,7 +74,12 @@ class Game extends React.Component {
               }
             </div>
             <div className="player-action">
-              <button className="hit-buton">Hit</button>
+              <button
+                className="hit-buton"
+                onClick={() => this.setState({ playerHand: this.state.playerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1)) })}
+              >
+                Hit
+              </button>
               <button className="stay-button">Stay</button>
             </div>
           </div>
