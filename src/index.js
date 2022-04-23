@@ -156,6 +156,7 @@ class Game extends React.Component {
               </button>
               <button
                 className="stay-button"
+                disabled={this.state.result !== ''}
                 onClick={() => this.stayAction(this.state.dealerHand, dealerScore, playerScore)}
               >
                 Stay
