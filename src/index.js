@@ -51,8 +51,11 @@ class Game extends React.Component {
   }
 
   calculateScore(allHand) {
+    const sortHand = JSON.parse(JSON.stringify(allHand)).sort((a,b) => sortKeys(a, b))
+
     let score = 0
-    for(const hand of allHand) {
+
+    for(const hand of sortHand) {
       score += Number(Object.keys(hand))
 
       if (score > 21 && Number(Object.keys(hand)) === 11) {
@@ -75,15 +78,13 @@ class Game extends React.Component {
 
   render() {
     // Dealer
-    const sortDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand)).sort((a,b) => sortKeys(a, b))
-    const dealerScore = this.calculateScore(sortDealerHand)
+    const dealerScore = this.calculateScore(this.state.dealerHand)
 
     let displayDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand))
     if (this.state.handClose) { displayDealerHand.splice(1, 1, { pending: '127136' }) }
 
     // Player
-    const sortPlayerHand = JSON.parse(JSON.stringify(this.state.playerHand)).sort((a,b) => sortKeys(a, b))
-    const playerScore = this.calculateScore(sortPlayerHand)
+    const playerScore = this.calculateScore(this.state.playerHand)
 
     return (
       <div className="game">
