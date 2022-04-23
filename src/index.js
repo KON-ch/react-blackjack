@@ -40,6 +40,7 @@ class Game extends React.Component {
       deck: deck,
       playerHand: playerHand,
       dealerHand: dealerHand,
+      handClose: true
     }
   }
 
@@ -65,6 +66,9 @@ class Game extends React.Component {
     const sortDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand)).sort((a,b) => sortKeys(a, b))
     const dealerScore = this.calculateScore(sortDealerHand)
 
+    let displayDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand))
+    if (this.state.handClose) { displayDealerHand.splice(1, 1, { pending: '127136' }) }
+
     // Player
     const sortPlayerHand = JSON.parse(JSON.stringify(this.state.playerHand)).sort((a,b) => sortKeys(a, b))
     const playerScore = this.calculateScore(sortPlayerHand)
@@ -73,10 +77,10 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <div className="dealer">
-            <div className="dealer-score">Dealer: { dealerScore }</div>
+            <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
             <div className="dealer-hand">
               {
-                this.state.dealerHand.map((hand) => {
+                displayDealerHand.map((hand) => {
                   return String.fromCodePoint(Object.values(hand))
                 })
               }
@@ -105,6 +109,7 @@ class Game extends React.Component {
               <button
                 className="stay-button"
                 onClick={() => {
+                  this.setState({ handClose: false })
                   if (dealerScore < 17) {
                     this.setState({ dealerHand: this.state.dealerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1)) })
                   }
