@@ -1,8 +1,29 @@
-.player-score, .dealer-score {
-  font-size: 12px;
+body {
+  margin: 0 !important;
 }
-.player-hand, .dealer-hand {
+.game-result {
+  float: right;
+  font-size: 12px;
+  margin: 0 8px;
+}
+.dealer-score {
+  font-size: 8px;
+  margin: 2px 8px 0;
+}
+.dealer-hand {
   font-size: 36px;
+  margin-left: 24px;
+  height: 48px;
+}
+.player {
+  text-align: center;
+}
+.player-score {
+  font-size: 8px;
+}
+.player-hand {
+  font-size: 36px;
+  height: 48px;
 }
 .hit-buton, .stay-button {
   margin: 0 12px;
