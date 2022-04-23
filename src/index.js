@@ -61,16 +61,12 @@ class Game extends React.Component {
   }
 
   render() {
-    let sortDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand))
-
-    sortDealerHand.sort((a,b) => sortKeys(a, b))
-
+    // Dealer
+    const sortDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand)).sort((a,b) => sortKeys(a, b))
     const dealerScore = this.calculateScore(sortDealerHand)
 
-    let sortPlayerHand = JSON.parse(JSON.stringify(this.state.playerHand))
-
-    sortPlayerHand.sort((a,b) => sortKeys(a, b))
-
+    // Player
+    const sortPlayerHand = JSON.parse(JSON.stringify(this.state.playerHand)).sort((a,b) => sortKeys(a, b))
     const playerScore = this.calculateScore(sortPlayerHand)
 
     return (
