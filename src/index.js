@@ -30,6 +30,8 @@ class Game extends React.Component {
   render() {
     const playerCard1 = this.state.deck.splice(randomNumber(0, 51), 1)[0]
     const dealerCard1 = this.state.deck.splice(randomNumber(0, 51), 1)[0]
+    const playerCard2 = this.state.deck.splice(randomNumber(0, 51), 1)[0]
+    const dealerCard2 = this.state.deck.splice(randomNumber(0, 51), 1)[0]
 
     return (
       <div className="game">
@@ -37,10 +39,12 @@ class Game extends React.Component {
           <div className="dealer">
             <div>Dealer: </div>
             { String.fromCodePoint(Object.values(dealerCard1)) }
+            { String.fromCodePoint(Object.values(dealerCard2)) }
           </div>
           <div className="player">
             <div>Player: </div>
             { String.fromCodePoint(Object.values(playerCard1)) }
+            { String.fromCodePoint(Object.values(playerCard2)) }
           </div>
         </div>
       </div>
