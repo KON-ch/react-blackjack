@@ -41,21 +41,34 @@ class Game extends React.Component {
   }
 
   render() {
-    const dealerScore = Number(Object.keys(this.state.dealerHand[0])) + Number(Object.keys(this.state.dealerHand[1]))
-    const playerScore = Number(Object.keys(this.state.playerHand[0])) + Number(Object.keys(this.state.playerHand[1]))
+    let dealerScore = 0
+    for(const hand of this.state.dealerHand) {
+      dealerScore += Number(Object.keys(hand))
+    }
+
+    let playerScore = 0
+    for(const hand of this.state.playerHand) {
+      playerScore += Number(Object.keys(hand))
+    }
 
     return (
       <div className="game">
         <div className="game-board">
           <div className="dealer">
             <div>Dealer: { dealerScore }</div>
-            { String.fromCodePoint(Object.values(this.state.dealerHand[0])) }
-            { String.fromCodePoint(Object.values(this.state.dealerHand[1])) }
+            {
+              this.state.dealerHand.map((hand) => {
+                return String.fromCodePoint(Object.values(hand))
+              })
+            }
           </div>
           <div className="player">
             <div>Player: { playerScore }</div>
-            { String.fromCodePoint(Object.values(this.state.playerHand[0])) }
-            { String.fromCodePoint(Object.values(this.state.playerHand[1])) }
+            {
+              this.state.playerHand.map((hand) => {
+                return String.fromCodePoint(Object.values(hand))
+              })
+            }
           </div>
         </div>
       </div>
