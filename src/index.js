@@ -5,6 +5,14 @@ import './index.css';
 const container = document.getElementById('root');
 const root = createRoot(container)
 
+function sortKeys(a, b) {
+  const aNumber = Number(Object.keys(a))
+  const bNumber = Number(Object.keys(b))
+  if (aNumber > bNumber) { return 1 }
+  if (aNumber < bNumber) { return -1 }
+  return 0
+}
+
 class Game extends React.Component {
   randomNumber(totalCount) {
     return (
@@ -43,13 +51,7 @@ class Game extends React.Component {
   render() {
     let sortDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand))
 
-    sortDealerHand.sort((a,b) => {
-      const aNumber = Number(Object.keys(a))
-      const bNumber = Number(Object.keys(b))
-      if (aNumber > bNumber) { return 1 }
-      if (aNumber < bNumber) { return -1 }
-      return 0
-    })
+    sortDealerHand.sort((a,b) => sortKeys(a, b))
 
     let dealerScore = 0
     for(const hand of sortDealerHand) {
@@ -62,13 +64,7 @@ class Game extends React.Component {
 
     let sortPlayerHand = JSON.parse(JSON.stringify(this.state.playerHand))
 
-    sortPlayerHand.sort((a,b) => {
-      const aNumber = Number(Object.keys(a))
-      const bNumber = Number(Object.keys(b))
-      if (aNumber > bNumber) { return 1 }
-      if (aNumber < bNumber) { return -1 }
-      return 0
-    })
+    sortPlayerHand.sort((a,b) => sortKeys(a, b))
 
     let playerScore = 0
 
