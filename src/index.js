@@ -40,7 +40,8 @@ class Game extends React.Component {
       deck: deck,
       playerHand: playerHand,
       dealerHand: dealerHand,
-      handClose: true
+      handClose: true,
+      result: '',
     }
   }
 
@@ -61,6 +62,17 @@ class Game extends React.Component {
     return score
   }
 
+  hitAction(playerScore) {
+    if (playerScore > 20) { return }
+
+    const newHand =  this.state.playerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1))
+    this.setState({ playerHand: newHand })
+
+    if(this.calculateScore(newHand) > 21) {
+      this.setState({ result: 'Winner: Dealer' })
+    }
+  }
+
   render() {
     // Dealer
     const sortDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand)).sort((a,b) => sortKeys(a, b))
@@ -75,6 +87,7 @@ class Game extends React.Component {
 
     return (
       <div className="game">
+        <div className="game-result">{ this.state.result }</div>
         <div className="game-board">
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
@@ -98,11 +111,7 @@ class Game extends React.Component {
             <div className="player-action">
               <button
                 className="hit-buton"
-                onClick={() => {
-                  if (playerScore < 21) {
-                    this.setState({ playerHand: this.state.playerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1)) })}
-                  }
-                }
+                onClick={ () => this.hitAction(playerScore) }
               >
                 Hit
               </button>
