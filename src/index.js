@@ -5,16 +5,13 @@ import './index.css';
 const container = document.getElementById('root');
 const root = createRoot(container)
 
-function randomNumber(min, max) {
-  const minNumber = min + 1
-  const maxNumber = max + 1
-
-  return (
-    Math.floor(Math.random() * maxNumber - minNumber) + minNumber
-  )
-}
-
 class Game extends React.Component {
+  randomNumber(totalCount) {
+    return (
+      Math.floor(Math.random() * totalCount - 1) + 1
+    )
+  }
+
   setup() {
     const deck = [
       { 11: 127137 }, { 2: 127138 }, { 3: 127139 }, { 4: 127140 }, { 5: 127141 }, { 6: 127142 }, { 7: 127143 }, { 8: 127144 }, { 9: 127145 }, { 10: 127146 }, { 10: 127147 }, { 10: 127149 }, { 10: 127150 },
@@ -23,10 +20,10 @@ class Game extends React.Component {
       { 11: 127185 }, { 2: 127186 }, { 3: 127187 }, { 4: 127188 }, { 5: 127189 }, { 6: 127190 }, { 7: 127191 }, { 8: 127192 }, { 9: 127193 }, { 10: 127194 }, { 10: 127195 }, { 10: 127197 }, { 10: 127198 },
     ]
 
-    const playerCard1 = deck.splice(randomNumber(0, 51), 1)[0]
-    const dealerCard1 = deck.splice(randomNumber(0, 51), 1)[0]
-    const playerCard2 = deck.splice(randomNumber(0, 51), 1)[0]
-    const dealerCard2 = deck.splice(randomNumber(0, 51), 1)[0]
+    const playerCard1 = deck.splice(this.randomNumber(deck.length), 1)[0]
+    const dealerCard1 = deck.splice(this.randomNumber(deck.length), 1)[0]
+    const playerCard2 = deck.splice(this.randomNumber(deck.length), 1)[0]
+    const dealerCard2 = deck.splice(this.randomNumber(deck.length), 1)[0]
 
     const playerHand = Number(Object.keys(playerCard1)) + Number(Object.keys(playerCard2))
     const dealerHand = Number(Object.keys(dealerCard1)) + Number(Object.keys(dealerCard2))
