@@ -76,14 +76,12 @@ class Game extends React.Component {
     return totalScore
   }
 
-  hitAction(playerScore) {
-    if (playerScore > 20) { return }
-
+  hitAction() {
     const newHand =  this.state.playerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1))
     this.setState({ playerHand: newHand })
 
     if(this.calculateScore(newHand) > 21) {
-      this.setState({ result: 'Winner: Dealer' })
+      this.setState({ result: 'Winner: Dealer', handClose: false })
     }
   }
 
@@ -151,6 +149,7 @@ class Game extends React.Component {
             <div className="player-action">
               <button
                 className="hit-buton"
+                disabled={!this.state.handClose}
                 onClick={ () => this.hitAction(playerScore) }
               >
                 Hit
