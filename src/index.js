@@ -161,6 +161,13 @@ class Game extends React.Component {
               >
                 Stay
               </button>
+              <button
+                className="restart-button"
+                disabled={this.state.result === ''}
+                onClick={() => { this.setState(this.setup()) }}
+              >
+                Restart
+              </button>
             </div>
           </div>
         </div>
