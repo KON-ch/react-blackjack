@@ -73,6 +73,10 @@ class Game extends React.Component {
                 })
               }
             </div>
+            <div className="player-action">
+              <button className="hit-buton">Hit</button>
+              <button className="stay-button">Stay</button>
+            </div>
           </div>
         </div>
       </div>
