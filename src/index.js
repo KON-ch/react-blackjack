@@ -41,7 +41,7 @@ class Game extends React.Component {
     const playerScore = this.calculateScore(playerHand)
     const dealerScore = this.calculateScore(dealerHand)
 
-    if (playerScore === 21) {
+    if (playerScore === 21 || dealerScore === 21) {
       result = this.resultJudgment(playerScore, dealerScore)
     }
 
@@ -49,7 +49,7 @@ class Game extends React.Component {
       deck: deck,
       playerHand: playerHand,
       dealerHand: dealerHand,
-      handClose: this.calculateScore(playerHand) !== 21,
+      handClose: result === '',
       result: result,
     }
   }
