@@ -76,6 +76,34 @@ class Game extends React.Component {
     }
   }
 
+  stayAction(dealerHand, dealerScore, playerScore) {
+    this.setState({ handClose: false })
+
+    if (dealerScore < 17) {
+      const newHand = dealerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1))
+
+      this.setState({ dealerHand: newHand })
+
+      const newScore = this.calculateScore(newHand)
+
+      if (newScore > 21) {
+        return this.setState({ result: 'Winner: Player' })
+      }
+
+      return this.stayAction(newHand, newScore, playerScore)
+    }
+
+    if (dealerScore === playerScore) {
+      return this.setState({ result: 'Result is Draw' })
+    }
+
+    if (dealerScore > playerScore) {
+      return this.setState({ result: 'Winner: Dealer' })
+    }
+
+    this.setState({ result: 'Winner: Player' })
+  }
+
   render() {
     // Dealer
     const dealerScore = this.calculateScore(this.state.dealerHand)
@@ -118,12 +146,7 @@ class Game extends React.Component {
               </button>
               <button
                 className="stay-button"
-                onClick={() => {
-                  this.setState({ handClose: false })
-                  if (dealerScore < 17) {
-                    this.setState({ dealerHand: this.state.dealerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1)) })
-                  }
-                }}
+                onClick={() => this.stayAction(this.state.dealerHand, dealerScore, playerScore)}
               >
                 Stay
               </button>
