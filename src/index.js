@@ -20,23 +20,18 @@ class Game extends React.Component {
       { 11: 127185 }, { 2: 127186 }, { 3: 127187 }, { 4: 127188 }, { 5: 127189 }, { 6: 127190 }, { 7: 127191 }, { 8: 127192 }, { 9: 127193 }, { 10: 127194 }, { 10: 127195 }, { 10: 127197 }, { 10: 127198 },
     ]
 
-    const playerCard1 = deck.splice(this.randomNumber(deck.length), 1)[0]
-    const dealerCard1 = deck.splice(this.randomNumber(deck.length), 1)[0]
-    const playerCard2 = deck.splice(this.randomNumber(deck.length), 1)[0]
-    const dealerCard2 = deck.splice(this.randomNumber(deck.length), 1)[0]
+    let playerHand = []
+    let dealerHand = []
 
-    const playerHand = Number(Object.keys(playerCard1)) + Number(Object.keys(playerCard2))
-    const dealerHand = Number(Object.keys(dealerCard1)) + Number(Object.keys(dealerCard2))
+    playerHand = playerHand.concat(deck.splice(this.randomNumber(deck.length), 1))
+    dealerHand = dealerHand.concat(deck.splice(this.randomNumber(deck.length), 1))
+    playerHand = playerHand.concat(deck.splice(this.randomNumber(deck.length), 1))
+    dealerHand = dealerHand.concat(deck.splice(this.randomNumber(deck.length), 1))
 
     return {
       deck: deck,
-      playerCard1: playerCard1,
-      playerCard2: playerCard2,
-      dealerCard1: dealerCard1,
-      dealerCard2: dealerCard2,
       playerHand: playerHand,
       dealerHand: dealerHand,
-
     }
   }
 
@@ -46,18 +41,21 @@ class Game extends React.Component {
   }
 
   render() {
+    const dealerScore = Number(Object.keys(this.state.dealerHand[0])) + Number(Object.keys(this.state.dealerHand[1]))
+    const playerScore = Number(Object.keys(this.state.playerHand[0])) + Number(Object.keys(this.state.playerHand[1]))
+
     return (
       <div className="game">
         <div className="game-board">
           <div className="dealer">
-            <div>Dealer: { this.state.dealerHand }</div>
-            { String.fromCodePoint(Object.values(this.state.dealerCard1)) }
-            { String.fromCodePoint(Object.values(this.state.dealerCard2)) }
+            <div>Dealer: { dealerScore }</div>
+            { String.fromCodePoint(Object.values(this.state.dealerHand[0])) }
+            { String.fromCodePoint(Object.values(this.state.dealerHand[1])) }
           </div>
           <div className="player">
-            <div>Player: { this.state.playerHand }</div>
-            { String.fromCodePoint(Object.values(this.state.playerCard1)) }
-            { String.fromCodePoint(Object.values(this.state.playerCard2)) }
+            <div>Player: { playerScore }</div>
+            { String.fromCodePoint(Object.values(this.state.playerHand[0])) }
+            { String.fromCodePoint(Object.values(this.state.playerHand[1])) }
           </div>
         </div>
       </div>
