@@ -76,6 +76,18 @@ class Game extends React.Component {
     return totalScore
   }
 
+  resultJudgment(playerScore, dealerScore) {
+    if (dealerScore === playerScore) {
+      return 'Result is Draw'
+    }
+
+    if (dealerScore > playerScore) {
+      return 'Winner: Dealer'
+    }
+
+    return 'Winner: Player'
+  }
+
   hitAction() {
     const newHand =  this.state.playerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1))
     this.setState({ playerHand: newHand })
@@ -102,15 +114,7 @@ class Game extends React.Component {
       return this.stayAction(newHand, newScore, playerScore)
     }
 
-    if (dealerScore === playerScore) {
-      return this.setState({ result: 'Result is Draw' })
-    }
-
-    if (dealerScore > playerScore) {
-      return this.setState({ result: 'Winner: Dealer' })
-    }
-
-    this.setState({ result: 'Winner: Player' })
+    this.setState({ result: this.resultJudgment(playerScore, dealerScore) })
   }
 
   render() {
