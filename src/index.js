@@ -105,7 +105,11 @@ class Game extends React.Component {
             <div className="player-action">
               <button
                 className="hit-buton"
-                onClick={() => this.setState({ playerHand: this.state.playerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1)) })}
+                onClick={() => {
+                  if (playerScore < 21) {
+                    this.setState({ playerHand: this.state.playerHand.concat(this.state.deck.splice(this.randomNumber(this.state.deck.length), 1)) })}
+                  }
+                }
               >
                 Hit
               </button>
