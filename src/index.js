@@ -48,33 +48,30 @@ class Game extends React.Component {
     this.state = this.setup()
   }
 
+  calculateScore(allHand) {
+    let score = 0
+    for(const hand of allHand) {
+      score += Number(Object.keys(hand))
+
+      if (Number(Object.keys(hand)) === 11 && score > 21) {
+        score -= 10
+      }
+    }
+    return score
+  }
+
   render() {
     let sortDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand))
 
     sortDealerHand.sort((a,b) => sortKeys(a, b))
 
-    let dealerScore = 0
-    for(const hand of sortDealerHand) {
-      dealerScore += Number(Object.keys(hand))
-
-      if (Number(Object.keys(hand)) === 11 && dealerScore > 21) {
-        dealerScore -= 10
-      }
-    }
+    const dealerScore = this.calculateScore(sortDealerHand)
 
     let sortPlayerHand = JSON.parse(JSON.stringify(this.state.playerHand))
 
     sortPlayerHand.sort((a,b) => sortKeys(a, b))
 
-    let playerScore = 0
-
-    for(const hand of sortPlayerHand) {
-      playerScore += Number(Object.keys(hand))
-
-      if (Number(Object.keys(hand)) === 11 && playerScore > 21) {
-        playerScore -= 10
-      }
-    }
+    const playerScore = this.calculateScore(sortPlayerHand)
 
     return (
       <div className="game">
