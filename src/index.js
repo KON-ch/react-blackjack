@@ -36,12 +36,21 @@ class Game extends React.Component {
     playerHand = playerHand.concat(deck.splice(this.randomNumber(deck.length), 1))
     dealerHand = dealerHand.concat(deck.splice(this.randomNumber(deck.length), 1))
 
+    let result = ''
+
+    const playerScore = this.calculateScore(playerHand)
+    const dealerScore = this.calculateScore(dealerHand)
+
+    if (playerScore === 21) {
+      result = this.resultJudgment(playerScore, dealerScore)
+    }
+
     return {
       deck: deck,
       playerHand: playerHand,
       dealerHand: dealerHand,
-      handClose: true,
-      result: '',
+      handClose: this.calculateScore(playerHand) !== 21,
+      result: result,
     }
   }
 
