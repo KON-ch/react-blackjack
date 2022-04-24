@@ -27,6 +27,15 @@ class Deck {
     return this.cards.splice(this.randomNumber(this.cards.length), 1)
   }
 
+  suitColor(card) {
+    const cardNumber = Number(Object.values(card))
+
+    if(cardNumber === 127136) { return { color: 'green' } }
+
+    if (cardNumber < 127151 || cardNumber > 127182) { return { color: 'black' } }
+    return { color: '#d30000' }
+  }
+
   randomNumber(totalCount) {
     return (
       Math.floor(Math.random() * totalCount - 1) + 1
@@ -136,15 +145,6 @@ class Game extends React.Component {
     this.setState({ result: this.resultJudgment(playerScore, dealerScore) })
   }
 
-  suitColor(hand) {
-    const suitNumber = Number(Object.values(hand))
-
-    if(suitNumber === 127136) { return { color: 'green' } }
-
-    if (suitNumber < 127151 || suitNumber > 127182) { return { color: 'black' } }
-    return { color: '#d30000' }
-  }
-
   render() {
     // Dealer
     const dealerScore = this.calculateScore(this.state.dealerHand)
@@ -164,7 +164,11 @@ class Game extends React.Component {
             <div className="dealer-hand">
               {
                 displayDealerHand.map((hand) => {
-                  return <span style={this.suitColor(hand)} key={Object.values(hand)}>{String.fromCodePoint(Object.values(hand))}</span>
+                  return (
+                    <span style={this.state.deck.suitColor(hand)} key={Object.values(hand)}>
+                      {String.fromCodePoint(Object.values(hand))}
+                    </span>
+                  )
                 })
               }
             </div>
@@ -174,7 +178,11 @@ class Game extends React.Component {
             <div className="player-hand">
               {
                 this.state.playerHand.map((hand) => {
-                  return <span style={this.suitColor(hand)} key={Object.values(hand)}>{String.fromCodePoint(Object.values(hand))}</span>
+                  return (
+                    <span style={this.state.deck.suitColor(hand)} key={Object.values(hand)}>
+                      {String.fromCodePoint(Object.values(hand))}
+                    </span>
+                  )
                 })
               }
             </div>
