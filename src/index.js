@@ -126,6 +126,13 @@ class Game extends React.Component {
     this.setState({ result: this.resultJudgment(playerScore, dealerScore) })
   }
 
+  suitColor(hand) {
+    const suitNumber = Number(Object.values(hand))
+
+    if (suitNumber < 127151 || suitNumber > 127182) { return { color: 'black' } }
+    return { color: '#d30000' }
+  }
+
   render() {
     // Dealer
     const dealerScore = this.calculateScore(this.state.dealerHand)
@@ -145,7 +152,7 @@ class Game extends React.Component {
             <div className="dealer-hand">
               {
                 displayDealerHand.map((hand) => {
-                  return String.fromCodePoint(Object.values(hand))
+                  return <span style={this.suitColor(hand)} key={Object.values(hand)}>{String.fromCodePoint(Object.values(hand))}</span>
                 })
               }
             </div>
@@ -155,7 +162,7 @@ class Game extends React.Component {
             <div className="player-hand">
               {
                 this.state.playerHand.map((hand) => {
-                  return String.fromCodePoint(Object.values(hand))
+                  return <span style={this.suitColor(hand)} key={Object.values(hand)}>{String.fromCodePoint(Object.values(hand))}</span>
                 })
               }
             </div>
