@@ -31,12 +31,25 @@ class Card extends React.Component {
 }
 
 class Hand {
-  constructor() {
+  constructor(faceDownCard) {
     this.hands = []
+    this.faceDown = false
+    this.faceDownCard = faceDownCard
+  }
+
+  display() {
+    if (this.faceDown) {
+      return [this.hands[0], this.faceDownCard]
+    }
+    return this.hands
   }
 
   addCard(card) {
     this.hands = this.hands.concat(card)
+  }
+
+  turnCard(faceDown) {
+    this.faceDown = faceDown
   }
 }
 
@@ -44,8 +57,8 @@ class Game extends React.Component {
   setup() {
     const deck = new Deck();
 
-    const playerHand = new Hand()
-    const dealerHand = new Hand()
+    const playerHand = new Hand(deck.faceDownCard())
+    const dealerHand = new Hand(deck.faceDownCard())
 
     playerHand.addCard(deck.drawCard())
     dealerHand.addCard(deck.drawCard())
@@ -146,8 +159,7 @@ class Game extends React.Component {
     // Dealer
     const dealerScore = this.calculateScore(this.state.dealerHand.hands)
 
-    let displayDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand))
-    if (this.state.handClose) { displayDealerHand.hands.splice(1, 1, this.state.deck.faceDownCard()) }
+    this.state.dealerHand.turnCard(this.state.handClose)
 
     // Player
     const playerScore = this.calculateScore(this.state.playerHand.hands)
@@ -159,13 +171,13 @@ class Game extends React.Component {
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
             <div className="dealer-hand">
-              <Card hands={displayDealerHand.hands} deck={this.state.deck} />
+              <Card hands={this.state.dealerHand.display()} deck={this.state.deck} />
             </div>
           </div>
           <div className="player">
             <div className="player-score">Player: { playerScore }</div>
             <div className="player-hand">
-              <Card hands={this.state.playerHand.hands} deck={this.state.deck} />
+              <Card hands={this.state.playerHand.display()} deck={this.state.deck} />
             </div>
             <div className="player-action">
               <button
