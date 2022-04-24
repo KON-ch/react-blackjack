@@ -21,6 +21,10 @@ export class Deck {
     return { color: '#d30000' }
   }
 
+  faceDownCard() {
+    return { 0: '127136' }
+  }
+
   randomNumber(totalCount) {
     return (
       Math.floor(Math.random() * totalCount - 1) + 1

@@ -122,7 +122,7 @@ class Game extends React.Component {
     const dealerScore = this.calculateScore(this.state.dealerHand)
 
     let displayDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand))
-    if (this.state.handClose) { displayDealerHand.splice(1, 1, { pending: '127136' }) }
+    if (this.state.handClose) { displayDealerHand.splice(1, 1, this.state.deck.faceDownCard()) }
 
     // Player
     const playerScore = this.calculateScore(this.state.playerHand)
