@@ -37,10 +37,10 @@ class Game extends React.Component {
     let playerHand = []
     let dealerHand = []
 
-    playerHand = playerHand.concat(deck.addCard())
-    dealerHand = dealerHand.concat(deck.addCard())
-    playerHand = playerHand.concat(deck.addCard())
-    dealerHand = dealerHand.concat(deck.addCard())
+    playerHand = playerHand.concat(deck.drawCard())
+    dealerHand = dealerHand.concat(deck.drawCard())
+    playerHand = playerHand.concat(deck.drawCard())
+    dealerHand = dealerHand.concat(deck.drawCard())
 
     let result = ''
 
@@ -104,7 +104,7 @@ class Game extends React.Component {
   }
 
   hitAction() {
-    const newHand =  this.state.playerHand.concat(this.state.deck.addCard())
+    const newHand =  this.state.playerHand.concat(this.state.deck.drawCard())
     this.setState({ playerHand: newHand })
 
     if(this.calculateScore(newHand) > 21) {
@@ -116,7 +116,7 @@ class Game extends React.Component {
     this.setState({ handClose: false })
 
     if (dealerScore < 17) {
-      const newHand = dealerHand.concat(this.state.deck.addCard())
+      const newHand = dealerHand.concat(this.state.deck.drawCard())
 
       this.setState({ dealerHand: newHand })
 

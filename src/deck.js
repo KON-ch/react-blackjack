@@ -8,7 +8,7 @@ export class Deck {
     ]
   }
 
-  addCard() {
+  drawCard() {
     return this.cards.splice(this.randomNumber(this.cards.length), 1)
   }
 
