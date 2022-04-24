@@ -189,7 +189,7 @@ class Game extends React.Component {
               </button>
               <button
                 className="start-button"
-                disabled={(this.state.bet === 0 || this.state.result !== '')}
+                disabled={(this.state.bet === 0 || this.state.playerHand.hands.length !== 0)}
                 onClick={ () => {
                   this.setState(this.setup(this.state.chip, this.state.bet))
                 }}
