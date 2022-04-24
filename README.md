@@ -1,70 +1,49 @@
-# Getting Started with Create React App
+# BlackJack
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 準備
+Dockerがインストールされていることを前提としています。
 
-## Available Scripts
+1. git clone
+   ```
+   git clone https://github.com/KON-ch/react-blackjack.git
+   ```
+1. Docker compose を起動する
+   ```
+   docker compose up
+   ```
 
-In the project directory, you can run:
+1. ブラウザで `http://localhost:3000` を開く
 
-### `npm start`
+## 遊び方
+BlackJackは配られたカードの合計を21に近づけるゲームです。
+ゲームはディーラー対プレイヤーで行われます。
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 計算方法
+カードの数字|計算される得点
+---|---
+2~10|そのカードの数字通り
+11~13|絵札は10として扱う
+1(エース)|1または11として扱う
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+(例)
+1枚目|2枚目|得点
+---|---|---
+3|9|12
+4|12|14
+1|7|8 or 18
 
-### `npm test`
+**配られた2枚のカードが21になる場合はブラックジャックとなります**(1と10~13の2枚の組み合わせ)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### ルール
+1. はじめにプレイヤーとディーラーに2枚のカードが配られます。
+   このとき、ディーラーのカードは1枚のみ公開されます。
+1. プレイヤーは2つのアクションを選択することができます。
+   1. **Hit** 手札にカードを1枚追加する<br>
+      Hitは22以上になるまで、何度でもできます。<br>
+      ただし、このとき手札の合計が22を超えた場合はその時点でプレイヤーの負けとなります。
+   1. **Stay** 追加のカードが不要なことを宣言する<br>
+      ディーラーの2枚目のカードが公開されます。<br>
+      ディーラーは手札の合計が17を超えるまでカードを追加します。<br>
+      このときディーラーの得点が22を超えた場合はプレイヤーの勝利となります。
+1. お互いの得点が22以上になっていない場合は、得点の大きい方の勝利です。<br>
+   得点が同じ場合は引き分けとなります。
