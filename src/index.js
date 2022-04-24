@@ -189,7 +189,7 @@ class Game extends React.Component {
               </button>
               <button
                 className="start-button"
-                disabled={this.state.bet === 0}
+                disabled={(this.state.bet === 0 || this.state.result !== '')}
                 onClick={ () => {
                   this.setState(this.setup(this.state.chip, this.state.bet))
                 }}
@@ -198,14 +198,14 @@ class Game extends React.Component {
               </button>
               <button
                 className="hit-buton"
-                disabled={!this.state.betClose}
+                disabled={(!this.state.betClose || this.state.result !== '')}
                 onClick={ () => this.hitAction(playerScore) }
               >
                 Hit
               </button>
               <button
                 className="stay-button"
-                disabled={!this.state.betClose}
+                disabled={(!this.state.betClose || this.state.result !== '')}
                 onClick={() => this.stayAction(this.state.dealerHand, dealerScore, playerScore)}
               >
                 Stay
