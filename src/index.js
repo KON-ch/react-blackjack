@@ -14,6 +14,17 @@ function sortKeys(a, b) {
   return 0
 }
 
+class Card extends React.Component {
+  render() {
+    return this.props.hands.map((hand) => {
+      return (
+        <span style={this.props.deck.suitColor(hand)} key={Object.values(hand)}>
+          {String.fromCodePoint(Object.values(hand))}
+        </span>
+      )
+    })
+  }
+}
 
 class Game extends React.Component {
   setup() {
@@ -134,29 +145,13 @@ class Game extends React.Component {
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
             <div className="dealer-hand">
-              {
-                displayDealerHand.map((hand) => {
-                  return (
-                    <span style={this.state.deck.suitColor(hand)} key={Object.values(hand)}>
-                      {String.fromCodePoint(Object.values(hand))}
-                    </span>
-                  )
-                })
-              }
+              <Card hands={displayDealerHand} deck={this.state.deck} />
             </div>
           </div>
           <div className="player">
             <div className="player-score">Player: { playerScore }</div>
             <div className="player-hand">
-              {
-                this.state.playerHand.map((hand) => {
-                  return (
-                    <span style={this.state.deck.suitColor(hand)} key={Object.values(hand)}>
-                      {String.fromCodePoint(Object.values(hand))}
-                    </span>
-                  )
-                })
-              }
+              <Card hands={this.state.playerHand} deck={this.state.deck} />
             </div>
             <div className="player-action">
               <button
