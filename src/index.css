@@ -18,7 +18,8 @@
 .point {
   font-weight: bold;
   display: inline-block;
-  margin-top: 64px;
+  margin-top: 57px;
+  font-size: 24px;
 }
 .dealer {
   text-align: center;
