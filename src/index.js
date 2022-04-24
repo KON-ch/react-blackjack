@@ -15,11 +15,15 @@ function sortKeys(a, b) {
 }
 
 class Card extends React.Component {
+  displayCard(hand){
+    return String.fromCodePoint(Object.values(hand))
+  }
+
   render() {
     return this.props.hands.map((hand) => {
       return (
         <span style={this.props.deck.suitColor(hand)} key={Object.values(hand)}>
-          {String.fromCodePoint(Object.values(hand))}
+          {this.displayCard(hand)}
         </span>
       )
     })
