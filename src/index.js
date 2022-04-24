@@ -129,6 +129,8 @@ class Game extends React.Component {
   suitColor(hand) {
     const suitNumber = Number(Object.values(hand))
 
+    if(suitNumber === 127136) { return { color: 'green' } }
+
     if (suitNumber < 127151 || suitNumber > 127182) { return { color: 'black' } }
     return { color: '#d30000' }
   }
