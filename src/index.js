@@ -30,22 +30,32 @@ class Card extends React.Component {
   }
 }
 
+class Hand {
+  constructor() {
+    this.hand = []
+  }
+
+  addCard(card) {
+    this.hand = this.hand.concat(card)
+  }
+}
+
 class Game extends React.Component {
   setup() {
     const deck = new Deck();
 
-    let playerHand = []
-    let dealerHand = []
+    const playerHand = new Hand()
+    const dealerHand = new Hand()
 
-    playerHand = playerHand.concat(deck.drawCard())
-    dealerHand = dealerHand.concat(deck.drawCard())
-    playerHand = playerHand.concat(deck.drawCard())
-    dealerHand = dealerHand.concat(deck.drawCard())
+    playerHand.addCard(deck.drawCard())
+    dealerHand.addCard(deck.drawCard())
+    playerHand.addCard(deck.drawCard())
+    dealerHand.addCard(deck.drawCard())
 
     let result = ''
 
-    const playerScore = this.calculateScore(playerHand)
-    const dealerScore = this.calculateScore(dealerHand)
+    const playerScore = this.calculateScore(playerHand.hand)
+    const dealerScore = this.calculateScore(dealerHand.hand)
 
     if (playerScore === 21 || dealerScore === 21) {
       result = this.resultJudgment(playerScore, dealerScore)
@@ -53,8 +63,8 @@ class Game extends React.Component {
 
     return {
       deck: deck,
-      playerHand: playerHand,
-      dealerHand: dealerHand,
+      playerHand: playerHand.hand,
+      dealerHand: dealerHand.hand,
       handClose: result === '',
       result: result,
     }
