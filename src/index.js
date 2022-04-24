@@ -32,11 +32,11 @@ class Card extends React.Component {
 
 class Hand {
   constructor() {
-    this.hand = []
+    this.hands = []
   }
 
   addCard(card) {
-    this.hand = this.hand.concat(card)
+    this.hands = this.hands.concat(card)
   }
 }
 
@@ -54,8 +54,8 @@ class Game extends React.Component {
 
     let result = ''
 
-    const playerScore = this.calculateScore(playerHand.hand)
-    const dealerScore = this.calculateScore(dealerHand.hand)
+    const playerScore = this.calculateScore(playerHand.hands)
+    const dealerScore = this.calculateScore(dealerHand.hands)
 
     if (playerScore === 21 || dealerScore === 21) {
       result = this.resultJudgment(playerScore, dealerScore)
@@ -117,7 +117,7 @@ class Game extends React.Component {
     this.state.playerHand.addCard(this.state.deck.drawCard())
     this.setState({ playerHand: this.state.playerHand })
 
-    if(this.calculateScore(this.state.playerHand.hand) > 21) {
+    if(this.calculateScore(this.state.playerHand.hands) > 21) {
       this.setState({ result: 'Winner: Dealer', handClose: false })
     }
   }
@@ -130,7 +130,7 @@ class Game extends React.Component {
 
       this.setState({ dealerHand: dealerHand })
 
-      const newScore = this.calculateScore(dealerHand.hand)
+      const newScore = this.calculateScore(dealerHand.hands)
 
       if (newScore > 21) {
         return this.setState({ result: 'Winner: Player' })
@@ -144,13 +144,13 @@ class Game extends React.Component {
 
   render() {
     // Dealer
-    const dealerScore = this.calculateScore(this.state.dealerHand.hand)
+    const dealerScore = this.calculateScore(this.state.dealerHand.hands)
 
     let displayDealerHand = JSON.parse(JSON.stringify(this.state.dealerHand))
-    if (this.state.handClose) { displayDealerHand.hand.splice(1, 1, this.state.deck.faceDownCard()) }
+    if (this.state.handClose) { displayDealerHand.hands.splice(1, 1, this.state.deck.faceDownCard()) }
 
     // Player
-    const playerScore = this.calculateScore(this.state.playerHand.hand)
+    const playerScore = this.calculateScore(this.state.playerHand.hands)
 
     return (
       <div className="game">
@@ -159,13 +159,13 @@ class Game extends React.Component {
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
             <div className="dealer-hand">
-              <Card hands={displayDealerHand.hand} deck={this.state.deck} />
+              <Card hands={displayDealerHand.hands} deck={this.state.deck} />
             </div>
           </div>
           <div className="player">
             <div className="player-score">Player: { playerScore }</div>
             <div className="player-hand">
-              <Card hands={this.state.playerHand.hand} deck={this.state.deck} />
+              <Card hands={this.state.playerHand.hands} deck={this.state.deck} />
             </div>
             <div className="player-action">
               <button
