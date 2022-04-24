@@ -4,6 +4,22 @@
   text-align: center;
   min-height: 48px;
 }
+.game-chip {
+  background-image: url('../public/chip.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: fixed;
+  top: 50px;
+  left: 85%;
+  height: 148px;
+  width: 148px;
+  text-align: center;
+}
+.point {
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 64px;
+}
 .dealer {
   text-align: center;
 }
@@ -17,6 +33,17 @@
 .player {
   text-align: center;
   margin-top: 16px;
+}
+.player-bet {
+  background-image: url('../public/chip.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: fixed;
+  top: 480px;
+  left: 10%;
+  height: 148px;
+  width: 148px;
+  text-align: center;
 }
 .player-score {
   font-size: 32px;

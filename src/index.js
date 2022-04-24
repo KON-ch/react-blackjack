@@ -165,7 +165,7 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-result">{ this.state.result } Acquire: { this.state.acquiredBed } points</div>
-        <div className="game-chip">{ this.state.chip }</div>
+        <div className="game-chip"><span className="point">{ this.state.chip }</span></div>
         <div className="game-board">
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
@@ -174,7 +174,7 @@ class Game extends React.Component {
             </div>
           </div>
           <div className="player">
-            <div className="player-bet">{ this.state.bet }</div>
+            <div className="player-bet"><span className="point">{ this.state.bet }</span></div>
             <div className="player-score">Player: { playerScore }</div>
             <div className="player-hand">
               <Card hands={this.state.playerHand.display()} deck={this.state.deck} />
