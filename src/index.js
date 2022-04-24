@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import './index.css';
 import { Deck } from "./deck"
+import { Hand } from "./hand"
 
 const container = document.getElementById('root');
 const root = createRoot(container)
@@ -27,29 +28,6 @@ class Card extends React.Component {
         </span>
       )
     })
-  }
-}
-
-class Hand {
-  constructor(faceDownCard) {
-    this.hands = []
-    this.faceDown = false
-    this.faceDownCard = faceDownCard
-  }
-
-  display() {
-    if (this.faceDown) {
-      return [this.hands[0], this.faceDownCard]
-    }
-    return this.hands
-  }
-
-  addCard(card) {
-    this.hands = this.hands.concat(card)
-  }
-
-  turnCard(faceDown) {
-    this.faceDown = faceDown
   }
 }
 
