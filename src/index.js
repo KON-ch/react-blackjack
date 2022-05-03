@@ -199,7 +199,7 @@ class Game extends React.Component {
               <button
                 className="hit-button"
                 disabled={(!this.state.betClose || this.state.result !== '')}
-                onClick={ () => this.hitAction(playerScore) }
+                onClick={ () => this.hitAction() }
               >
                 Hit
               </button>
