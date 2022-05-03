@@ -31,16 +31,16 @@ class Card extends React.Component {
   }
 }
 
-class Bet extends React.Component {
+class Chip extends React.Component {
   render() {
-    const bet = this.props.bet
+    const chip = this.props.chip
 
-    if (bet === 0) { return }
+    if (chip === 0) { return }
 
     return (
       <div className="player-bet">
         <span className="point">
-          { bet }
+          { chip }
         </span>
       </div>
     )
@@ -207,7 +207,7 @@ class Game extends React.Component {
             </div>
           </div>
           <div className="player">
-            <Bet bet={this.state.bet} />
+            <Chip chip={this.state.bet} />
             <div className="player-score">Player: { playerScore }</div>
             <div className="player-hand">
               <Card hands={this.state.playerHand.display()} deck={this.state.deck} />
