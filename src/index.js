@@ -133,7 +133,9 @@ class Game extends React.Component {
     }
   }
 
-  stayAction(dealerHand, dealerScore, playerScore) {
+  stayAction(dealerScore, playerScore) {
+    const dealerHand = this.state.dealerHand
+
     this.setState({ handClose: false })
 
     if (dealerScore < 17) {
@@ -206,7 +208,7 @@ class Game extends React.Component {
               <button
                 className="stay-button"
                 disabled={(!this.state.betClose || this.state.result !== '')}
-                onClick={() => this.stayAction(this.state.dealerHand, dealerScore, playerScore)}
+                onClick={() => this.stayAction(dealerScore, playerScore)}
               >
                 Stay
               </button>
