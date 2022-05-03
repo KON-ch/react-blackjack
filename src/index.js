@@ -63,7 +63,7 @@ class Game extends React.Component {
         result: '',
         chip: chip,
         bet: bet,
-        acquiredbet: 0,
+        reward: 0,
         betClose: false,
       }
     }
@@ -82,7 +82,7 @@ class Game extends React.Component {
       result = this.resultJudgment(playerScore, dealerScore, bet).result
     }
 
-    const acquiredbet = result === 'Winner: Player' ? bet * 2.5 : 0
+    const reward = result === 'Winner: Player' ? bet * 2.5 : 0
 
     return {
       deck: deck,
@@ -92,7 +92,7 @@ class Game extends React.Component {
       result: result,
       chip: chip,
       bet: bet,
-      acquiredbet: acquiredbet,
+      reward: reward,
       betClose: true,
     }
   }
@@ -130,14 +130,14 @@ class Game extends React.Component {
 
   resultJudgment(playerScore, dealerScore, bet) {
     if (dealerScore === playerScore) {
-      return { result: 'Result is Draw', acquiredbet: bet }
+      return { result: 'Result is Draw', reward: bet }
     }
 
     if (dealerScore > playerScore) {
       return { result: 'Winner: Dealer', bet: 0 }
     }
 
-    return { result: 'Winner: Player', acquiredbet: bet * 2 }
+    return { result: 'Winner: Player', reward: bet * 2 }
   }
 
   hitAction() {
@@ -177,7 +177,7 @@ class Game extends React.Component {
       const newScore = this.calculateScore(dealerHand.hands)
 
       if (newScore > 21) {
-        return this.setState({ result: 'Winner: Player', acquiredbet: bet * 2 })
+        return this.setState({ result: 'Winner: Player', reward: bet * 2 })
       }
 
       return this.stayAction(newScore, playerScore, bet)
@@ -197,7 +197,7 @@ class Game extends React.Component {
 
     return (
       <div className="game">
-        <div className="game-result">{ this.state.result } Acquire: { this.state.acquiredbet } points</div>
+        <div className="game-result">{ this.state.result } Acquire: { this.state.reward } points</div>
         <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
@@ -253,7 +253,7 @@ class Game extends React.Component {
               <button
                 className="restart-button"
                 disabled={this.state.result === ''}
-                onClick={() => { this.setState(this.setup(this.state.chip + this.state.acquiredbet, 0)) }}
+                onClick={() => { this.setState(this.setup(this.state.chip + this.state.reward, 0)) }}
               >
                 Restart
               </button>
