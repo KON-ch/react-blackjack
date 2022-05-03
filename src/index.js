@@ -134,7 +134,7 @@ class Game extends React.Component {
     }
 
     if (dealerScore > playerScore) {
-      return { result: 'Winner: Dealer' }
+      return { result: 'Winner: Dealer', bet: 0 }
     }
 
     return { result: 'Winner: Player', acquiredbet: bet * 2 }
@@ -145,7 +145,7 @@ class Game extends React.Component {
     this.setState({ playerHand: this.state.playerHand })
 
     if(this.calculateScore(this.state.playerHand.hands) > 21) {
-      this.setState({ result: 'Winner: Dealer', handClose: false })
+      this.setState({ result: 'Winner: Dealer', handClose: false, bet: 0 })
     }
   }
 
@@ -158,7 +158,7 @@ class Game extends React.Component {
     const playerScore = this.calculateScore(this.state.playerHand.hands)
 
     if(playerScore > 21) {
-      return this.setState({ result: 'Winner: Dealer', handClose: false })
+      return this.setState({ result: 'Winner: Dealer', handClose: false, bet: 0 })
     }
 
     this.stayAction(dealerScore, playerScore, bet)
