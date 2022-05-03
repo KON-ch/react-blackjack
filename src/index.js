@@ -63,7 +63,7 @@ class Game extends React.Component {
     const dealerScore = this.calculateScore(dealerHand.hands)
 
     if (playerScore === 21 || dealerScore === 21) {
-      result = this.resultJudgment(playerScore, dealerScore).result
+      result = this.resultJudgment(playerScore, dealerScore, bet).result
     }
 
     const acquiredbet = result === 'Winner: Player' ? bet * 2.5 : 0
@@ -112,16 +112,16 @@ class Game extends React.Component {
     return totalScore
   }
 
-  resultJudgment(playerScore, dealerScore) {
+  resultJudgment(playerScore, dealerScore, bet) {
     if (dealerScore === playerScore) {
-      return { result: 'Result is Draw', acquiredbet: this.state.bet }
+      return { result: 'Result is Draw', acquiredbet: bet }
     }
 
     if (dealerScore > playerScore) {
       return { result: 'Winner: Dealer' }
     }
 
-    return { result: 'Winner: Player', acquiredbet: this.state.bet * 2 }
+    return { result: 'Winner: Player', acquiredbet: bet * 2 }
   }
 
   hitAction() {
@@ -133,7 +133,7 @@ class Game extends React.Component {
     }
   }
 
-  stayAction(dealerScore, playerScore) {
+  stayAction(dealerScore, playerScore, bet) {
     const dealerHand = this.state.dealerHand
 
     this.setState({ handClose: false })
@@ -146,13 +146,13 @@ class Game extends React.Component {
       const newScore = this.calculateScore(dealerHand.hands)
 
       if (newScore > 21) {
-        return this.setState({ result: 'Winner: Player', acquiredbet: this.state.bet * 2 })
+        return this.setState({ result: 'Winner: Player', acquiredbet: bet * 2 })
       }
 
-      return this.stayAction(dealerHand, newScore, playerScore)
+      return this.stayAction(newScore, playerScore, bet)
     }
 
-    this.setState(this.resultJudgment(playerScore, dealerScore))
+    this.setState(this.resultJudgment(playerScore, dealerScore, bet))
   }
 
   render() {
@@ -208,7 +208,7 @@ class Game extends React.Component {
               <button
                 className="stay-button"
                 disabled={(!this.state.betClose || this.state.result !== '')}
-                onClick={() => this.stayAction(dealerScore, playerScore)}
+                onClick={() => { this.stayAction(dealerScore, playerScore, this.state.bet)}}
               >
                 Stay
               </button>
