@@ -197,7 +197,7 @@ class Game extends React.Component {
                 Start
               </button>
               <button
-                className="hit-buton"
+                className="hit-button"
                 disabled={(!this.state.betClose || this.state.result !== '')}
                 onClick={ () => this.hitAction(playerScore) }
               >
