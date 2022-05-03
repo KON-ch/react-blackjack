@@ -15,6 +15,17 @@
   width: 148px;
   text-align: center;
 }
+.reward-chip{
+  background-image: url('../public/chip.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: fixed;
+  top: 300px;
+  left: 10%;
+  height: 148px;
+  width: 148px;
+  text-align: center;
+}
 .point {
   font-weight: bold;
   display: inline-block;

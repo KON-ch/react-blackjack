@@ -197,7 +197,10 @@ class Game extends React.Component {
 
     return (
       <div className="game">
-        <div className="game-result">{ this.state.result } Acquire: { this.state.reward } points</div>
+        <div className="game-result">
+          <Chip chip={this.state.reward} role="reward-chip" />
+          { this.state.result }
+        </div>
         <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
