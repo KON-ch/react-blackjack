@@ -82,7 +82,7 @@ class Game extends React.Component {
       result = this.resultJudgment(playerScore, dealerScore, bet).result
     }
 
-    const reward = result === 'Winner: Player' ? bet * 2.5 : 0
+    const reward = result === 'Winner: Player' ? bet * 1.5 : 0
 
     return {
       deck: deck,
@@ -130,14 +130,14 @@ class Game extends React.Component {
 
   resultJudgment(playerScore, dealerScore, bet) {
     if (dealerScore === playerScore) {
-      return { result: 'Result is Draw', reward: bet }
+      return { result: 'Result is Draw' }
     }
 
     if (dealerScore > playerScore) {
       return { result: 'Winner: Dealer', bet: 0 }
     }
 
-    return { result: 'Winner: Player', reward: bet * 2 }
+    return { result: 'Winner: Player', reward: bet }
   }
 
   hitAction() {
@@ -177,7 +177,7 @@ class Game extends React.Component {
       const newScore = this.calculateScore(dealerHand.hands)
 
       if (newScore > 21) {
-        return this.setState({ result: 'Winner: Player', reward: bet * 2 })
+        return this.setState({ result: 'Winner: Player', reward: bet })
       }
 
       return this.stayAction(newScore, playerScore, bet)
@@ -256,7 +256,7 @@ class Game extends React.Component {
               <button
                 className="restart-button"
                 disabled={this.state.result === ''}
-                onClick={() => { this.setState(this.setup(this.state.chip + this.state.reward, 0)) }}
+                onClick={() => { this.setState(this.setup(this.state.chip + this.state.bet + this.state.reward, 0)) }}
               >
                 Restart
               </button>
