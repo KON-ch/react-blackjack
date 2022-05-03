@@ -133,6 +133,21 @@ class Game extends React.Component {
     }
   }
 
+  doubleAction(dealerScore) {
+    const bet = this.state.bet * 2
+
+    this.state.playerHand.addCard(this.state.deck.drawCard())
+    this.setState({ bet: bet, playerHand: this.state.playerHand })
+
+    const playerScore = this.calculateScore(this.state.playerHand.hands)
+
+    if(playerScore > 21) {
+      return this.setState({ result: 'Winner: Dealer', handClose: false })
+    }
+
+    this.stayAction(dealerScore, playerScore, bet)
+  }
+
   stayAction(dealerScore, playerScore, bet) {
     const dealerHand = this.state.dealerHand
 
@@ -204,6 +219,13 @@ class Game extends React.Component {
                 onClick={ () => this.hitAction() }
               >
                 Hit
+              </button>
+              <button
+                className="double-button"
+                disabled={(!this.state.betClose || this.state.result !== '')}
+                onClick={ () => this.doubleAction(dealerScore) }
+              >
+                Double
               </button>
               <button
                 className="stay-button"

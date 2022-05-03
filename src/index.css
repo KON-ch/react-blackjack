@@ -53,7 +53,7 @@
   font-size: 172px;
   height: 256px;
 }
-.bet-button, .start-button, .hit-button, .stay-button, .restart-button {
+.bet-button, .start-button, .hit-button, .double-button, .stay-button, .restart-button {
   margin: 0 12px;
   font-size: 24px;
   width: 128px;
