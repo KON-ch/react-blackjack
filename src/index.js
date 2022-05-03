@@ -198,7 +198,7 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-result">{ this.state.result } Acquire: { this.state.acquiredbet } points</div>
-        <div className="game-chip"><span className="point">{ this.state.chip }</span></div>
+        <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
