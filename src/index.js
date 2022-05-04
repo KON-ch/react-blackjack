@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import './index.css';
 import { Deck } from "./deck"
 import { Hand } from "./hand"
-import { Card } from "./card"
+import { HandCards } from "./hand_cards";
 
 const container = document.getElementById('root');
 const root = createRoot(container)
@@ -14,14 +14,6 @@ function sortKeys(a, b) {
   if (aNumber > bNumber) { return 1 }
   if (aNumber < bNumber) { return -1 }
   return 0
-}
-
-class HandCards extends React.Component {
-  render() {
-    return this.props.hands.map((hand) => {
-      return <Card hand={hand} deck={this.props.deck} key={Object.values(hand)} />
-    })
-  }
 }
 
 class Chip extends React.Component {
