@@ -4,6 +4,7 @@ import './index.css';
 import { Deck } from "./deck"
 import { Hand } from "./hand"
 import { HandCards } from "./hand_cards";
+import { Chip } from "./chip"
 
 const container = document.getElementById('root');
 const root = createRoot(container)
@@ -14,22 +15,6 @@ function sortKeys(a, b) {
   if (aNumber > bNumber) { return 1 }
   if (aNumber < bNumber) { return -1 }
   return 0
-}
-
-class Chip extends React.Component {
-  render() {
-    const chip = this.props.chip
-
-    if (chip === 0) { return }
-
-    return (
-      <div className={this.props.role}>
-        <span className="point">
-          { chip }
-        </span>
-      </div>
-    )
-  }
 }
 
 class DoubleDownChip extends React.Component {
