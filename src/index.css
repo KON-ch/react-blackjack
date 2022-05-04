@@ -57,6 +57,17 @@
   width: 148px;
   text-align: center;
 }
+.double-down-bet {
+  background-image: url('../public/chip.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: fixed;
+  top: 480px;
+  left: 20%;
+  height: 148px;
+  width: 148px;
+  text-align: center;
+}
 .player-score {
   font-size: 32px;
 }

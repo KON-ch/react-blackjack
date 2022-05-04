@@ -47,6 +47,14 @@ class Chip extends React.Component {
   }
 }
 
+class DoubleDownChip extends React.Component {
+  render() {
+    if (!this.props.doubleDown) { return }
+
+    return <Chip chip={this.props.bet} role="double-down-bet" />
+  }
+}
+
 class Game extends React.Component {
   setup(chip, bet) {
     const deck = new Deck();
@@ -65,6 +73,7 @@ class Game extends React.Component {
         bet: bet,
         reward: 0,
         betClose: false,
+        doubleDown: false
       }
     }
 
@@ -96,6 +105,7 @@ class Game extends React.Component {
       bet: bet,
       reward: reward,
       betClose: true,
+      doubleDown: false,
     }
   }
 
@@ -152,10 +162,11 @@ class Game extends React.Component {
   }
 
   doubleAction(dealerScore) {
-    const bet = this.state.bet * 2
+    const bet = this.state.bet
+    const chip = this.state.chip - bet
 
     this.state.playerHand.addCard(this.state.deck.drawCard())
-    this.setState({ bet: bet, playerHand: this.state.playerHand })
+    this.setState({ chip: chip, doubleDown: true, playerHand: this.state.playerHand })
 
     const playerScore = this.calculateScore(this.state.playerHand.hands)
 
@@ -163,7 +174,7 @@ class Game extends React.Component {
       return this.setState({ result: 'Winner: Dealer', handClose: false, bet: 0 })
     }
 
-    this.stayAction(dealerScore, playerScore, bet)
+    this.stayAction(dealerScore, playerScore, bet * 2)
   }
 
   stayAction(dealerScore, playerScore, bet) {
@@ -213,6 +224,7 @@ class Game extends React.Component {
           </div>
           <div className="player">
             <Chip chip={this.state.bet} role="player-bet" />
+            <DoubleDownChip bet={this.state.bet} doubleDown={this.state.doubleDown} />
             <div className="player-score">Player: { playerScore }</div>
             <div className="player-hand">
               <Card hands={this.state.playerHand.display()} deck={this.state.deck} />
