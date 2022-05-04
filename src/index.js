@@ -161,12 +161,15 @@ class Game extends React.Component {
     }
   }
 
-  doubleAction(dealerScore) {
+  async doubleAction(dealerScore) {
     const bet = this.state.bet
     const chip = this.state.chip - bet
 
     this.state.playerHand.addCard(this.state.deck.drawCard())
     this.setState({ chip: chip, doubleDown: true, playerHand: this.state.playerHand })
+
+    const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    await _sleep(300);
 
     const playerScore = this.calculateScore(this.state.playerHand.hands)
 
