@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import './index.css';
 import { Deck } from "./deck"
 import { Hand } from "./hand"
+import { Card } from "./card"
 
 const container = document.getElementById('root');
 const root = createRoot(container)
@@ -20,22 +21,6 @@ class HandCards extends React.Component {
     return this.props.hands.map((hand) => {
       return <Card hand={hand} deck={this.props.deck} key={Object.values(hand)} />
     })
-  }
-}
-
-class Card extends React.Component {
-  displayCard(hand){
-    return String.fromCodePoint(Object.values(hand))
-  }
-
-  render() {
-    const hand = this.props.hand
-
-    return (
-      <span style={this.props.deck.suitColor(hand)}>
-        {this.displayCard(hand)}
-      </span>
-    )
   }
 }
 
