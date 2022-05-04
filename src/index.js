@@ -84,6 +84,8 @@ class Game extends React.Component {
 
     const reward = result === 'Winner: Player' ? bet * 1.5 : 0
 
+    if (result === 'Winner: Dealer') { bet = 0 }
+
     return {
       deck: deck,
       playerHand: playerHand,
