@@ -1,8 +1,6 @@
-import deck from './deck.json'
-
 export class Deck {
-  constructor() {
-    this.cards = deck.cards
+  constructor(cards) {
+    this.cards = cards
   }
 
   drawCard() {
