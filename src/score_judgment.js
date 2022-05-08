@@ -1,4 +1,4 @@
-export class scoreJudgment {
+export class ScoreJudgment {
   constructor(hands) {
     this.hands = hands
   }
