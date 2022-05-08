@@ -12,7 +12,7 @@ export class ScoreJudgment {
       return card.value
     })
 
-    let aceCount = handValues.filter((value) => value === 11 ).length
+    let aceCount = handValues.filter((value) => value === 11).length
 
     let totalScore = handValues.reduce((sum, element) => {
       return sum + element
