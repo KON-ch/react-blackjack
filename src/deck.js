@@ -1,4 +1,4 @@
-import deck from '../public/deck.json'
+import deck from './deck.json'
 
 export class Deck {
   constructor() {
