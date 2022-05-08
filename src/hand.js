@@ -13,7 +13,7 @@ export class Hand {
   }
 
   addCard(card) {
-    new Hand(this.hands.concat(card))
+    return new Hand(this.hands.concat(card))
   }
 
   cardFaceDown(boolean) {
