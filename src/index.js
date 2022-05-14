@@ -1,21 +1,21 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import './index.css';
+
 import { Deck } from "./deck"
 import { Hand } from "./hand"
+import { ScoreJudgment } from "./score_judgment"
+import { ResultJudgment } from "./result_judgment";
+
+// Component
 import { HandCards } from "./hand_cards";
 import { Chip } from "./chip"
 
+// JSON
+import defaultDeck from './deck.json'
+
 const container = document.getElementById('root');
 const root = createRoot(container)
-
-function sortKeys(a, b) {
-  const aNumber = Number(Object.keys(a))
-  const bNumber = Number(Object.keys(b))
-  if (aNumber > bNumber) { return 1 }
-  if (aNumber < bNumber) { return -1 }
-  return 0
-}
 
 class DoubleDownChip extends React.Component {
   render() {
@@ -27,54 +27,47 @@ class DoubleDownChip extends React.Component {
 
 class Game extends React.Component {
   setup(chip, bet) {
-    const deck = new Deck();
+    // 52枚のカードで毎回開始できるようにディープコピーしている
+    const defaultCards = JSON.parse(JSON.stringify((defaultDeck))).cards
 
-    const playerHand = new Hand(deck.faceDownCard())
-    const dealerHand = new Hand(deck.faceDownCard())
+    const deck = new Deck(defaultCards)
 
-    if (bet === 0) {
-      return {
-        deck: deck,
-        playerHand: playerHand,
-        dealerHand: dealerHand,
-        handClose: false,
-        result: '',
-        chip: chip,
-        bet: bet,
-        reward: 0,
-        betClose: false,
-        doubleDown: false
-      }
+    let playerCards = []
+    let dealerCards = []
+
+    if (bet > 0) {
+      playerCards = playerCards.concat(deck.drawCard())
+      dealerCards = dealerCards.concat(deck.drawCard())
+      playerCards = playerCards.concat(deck.drawCard())
+      dealerCards = dealerCards.concat(deck.drawCard())
     }
 
-    playerHand.addCard(deck.drawCard())
-    dealerHand.addCard(deck.drawCard())
-    playerHand.addCard(deck.drawCard())
-    dealerHand.addCard(deck.drawCard())
+    const playerHand = new Hand(playerCards)
+    const dealerHand = new Hand(dealerCards)
 
-    let result = ''
+    let resultMessage = ''
+    let reward = 0
 
-    const playerScore = this.calculateScore(playerHand.hands)
-    const dealerScore = this.calculateScore(dealerHand.hands)
+    const playerScore = new ScoreJudgment(playerHand.hands).score()
+    const dealerScore = new ScoreJudgment(dealerHand.hands).score()
 
     if (playerScore === 21 || dealerScore === 21) {
-      result = this.resultJudgment(playerScore, dealerScore, bet).result
+      const result = new ResultJudgment(playerScore, dealerScore)
+      resultMessage = result.resultMessage()
+      if (result.isPlayerVictory()) { reward = bet * 1.5 }
+      if (result.isDealerVictory()) { bet = 0 }
     }
-
-    const reward = result === 'Winner: Player' ? bet * 1.5 : 0
-
-    if (result === 'Winner: Dealer') { bet = 0 }
 
     return {
       deck: deck,
       playerHand: playerHand,
       dealerHand: dealerHand,
-      handClose: result === '',
-      result: result,
+      handClose: resultMessage === '',
+      result: resultMessage,
       chip: chip,
       bet: bet,
       reward: reward,
-      betClose: true,
+      betClose: bet > 0,
       doubleDown: false,
     }
   }
@@ -84,50 +77,16 @@ class Game extends React.Component {
     this.state = this.setup(1000, 0)
   }
 
-  calculateScore(allHand) {
-    const sortHand = JSON.parse(JSON.stringify(allHand)).sort((a,b) => sortKeys(a, b))
-
-    let totalScore = 0
-
-    let aceCount = 0
-
-    for(const hand of sortHand) {
-      const score = Number(Object.keys(hand))
-      totalScore += score
-
-      if (score === 11) {
-        aceCount++
-
-        if (totalScore > 21) {
-          totalScore -= 10
-          aceCount--
-        }
-      }
-    }
-
-    if (aceCount !== 0 && totalScore > 21 ) { totalScore -= 10 }
-
-    return totalScore
-  }
-
-  resultJudgment(playerScore, dealerScore, bet) {
-    if (dealerScore === playerScore) {
-      return { result: 'Result is Draw' }
-    }
-
-    if (dealerScore > playerScore) {
-      return { result: 'Winner: Dealer', bet: 0 }
-    }
-
-    return { result: 'Winner: Player', reward: bet }
-  }
-
   hitAction() {
-    this.state.playerHand.addCard(this.state.deck.drawCard())
-    this.setState({ playerHand: this.state.playerHand })
+    const newCard = this.state.deck.drawCard()
+    const newHand = this.state.playerHand.addCard(newCard)
+    const newScore = new ScoreJudgment(newHand.hands).score()
 
-    if(this.calculateScore(this.state.playerHand.hands) > 21) {
-      this.setState({ result: 'Winner: Dealer', handClose: false, bet: 0 })
+    this.setState({ playerHand: newHand })
+
+    if(newScore > 21) {
+      const result = new ResultJudgment(newScore, 0)
+      this.setState({ result: result.resultMessage(), handClose: false, bet: 0 })
     }
   }
 
@@ -141,45 +100,54 @@ class Game extends React.Component {
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
 
-    const playerScore = this.calculateScore(this.state.playerHand.hands)
+    const playerScore = new ScoreJudgment(this.state.playerHand.hands).score()
 
     if(playerScore > 21) {
-      return this.setState({ result: 'Winner: Dealer', handClose: false, bet: 0 })
+      const result = new ResultJudgment(playerScore, dealerScore)
+      return this.setState({ result: result.resultMessage(), handClose: false, bet: 0 })
     }
 
     this.stayAction(dealerScore, playerScore, bet * 2)
   }
 
   stayAction(dealerScore, playerScore, bet) {
-    const dealerHand = this.state.dealerHand
-
     this.setState({ handClose: false })
 
     if (dealerScore < 17) {
-      dealerHand.addCard(this.state.deck.drawCard())
+      const newCard = this.state.deck.drawCard()
+      const newHand = this.state.dealerHand.addCard(newCard)
 
-      this.setState({ dealerHand: dealerHand })
+      this.setState({ dealerHand: newHand })
 
-      const newScore = this.calculateScore(dealerHand.hands)
+      const newScore = new ScoreJudgment(newHand.hands).score()
 
       if (newScore > 21) {
-        return this.setState({ result: 'Winner: Player', reward: bet })
+        const result = new ResultJudgment(playerScore, newScore)
+        return this.setState({ result: result.resultMessage(), reward: bet })
       }
 
       return this.stayAction(newScore, playerScore, bet)
     }
 
-    this.setState(this.resultJudgment(playerScore, dealerScore, bet))
+    const result = new ResultJudgment(playerScore, dealerScore)
+
+    let resultState
+    if (result.isDealerVictory()) { resultState = { bet: 0 } }
+    if (result.isPlayerVictory()) { resultState = { reward: bet } }
+
+    this.setState({ result: result.resultMessage(), ...resultState })
   }
 
   render() {
     // Dealer
-    const dealerScore = this.calculateScore(this.state.dealerHand.hands)
+    const dealerHand = this.state.dealerHand
 
-    this.state.dealerHand.turnCard(this.state.handClose)
+    const dealerScore = new ScoreJudgment(dealerHand.hands).score()
+
+    if (dealerHand.hands.length > 0) { dealerHand.cardFaceDown(this.state.handClose) }
 
     // Player
-    const playerScore = this.calculateScore(this.state.playerHand.hands)
+    const playerScore = new ScoreJudgment(this.state.playerHand.hands).score()
 
     return (
       <div className="game">
