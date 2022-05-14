@@ -128,9 +128,11 @@ class Game extends React.Component {
   }
 
   stayAction(dealerScore, playerScore, bet) {
+    const dealerHand = this.state.dealerHand
+
     if (dealerScore < 17) {
       const newCard = this.state.deck.drawCard()
-      const newHand = this.state.dealerHand.addCard(newCard)
+      const newHand = dealerHand.addCard(newCard)
 
       this.setState({ dealerHand: newHand })
 
@@ -151,7 +153,7 @@ class Game extends React.Component {
     if (result.isDealerVictory()) { resultState = { bet: 0, doubleDownBet: 0 } }
     if (result.isPlayerVictory()) { resultState = { reward: bet } }
 
-    this.setState({ result: result.resultMessage(), ...resultState, progress: 'finish' })
+    this.setState({ result: result.resultMessage(), ...resultState, dealerHand: dealerHand.cardFaceUp(), progress: 'finish' })
   }
 
   render() {
