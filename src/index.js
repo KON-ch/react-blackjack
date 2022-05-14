@@ -46,7 +46,7 @@ class Game extends React.Component {
     const dealerCard2 = deck.drawCard()
 
     const playerHand = new Hand([playerCard1, playerCard2])
-    const dealerHand = new Hand([dealerCard1, dealerCard2]).cardFaceDown()
+    const dealerHand = new Hand([dealerCard1, dealerCard2])
 
     const playerScore = new ScoreJudgment(playerHand.cards).score()
     const dealerScore = new ScoreJudgment(dealerHand.cards).score()
@@ -60,7 +60,7 @@ class Game extends React.Component {
       return {
         deck: deck,
         playerHand: playerHand,
-        dealerHand: dealerHand.cardFaceUp(),
+        dealerHand: dealerHand,
         result: result.resultMessage(),
         chip: chip,
         bet: returnBet,
@@ -74,7 +74,7 @@ class Game extends React.Component {
     return {
       deck: deck,
       playerHand: playerHand,
-      dealerHand: dealerHand,
+      dealerHand: dealerHand.cardFaceDown(),
       result: '',
       chip: chip,
       bet: bet,
@@ -118,18 +118,17 @@ class Game extends React.Component {
 
     this.setState({ playerHand: newHand })
 
+    const dealerHand = this.state.dealerHand.cardFaceUp()
+
     if(playerScore > 21) {
       const result = new ResultJudgment(playerScore, dealerScore)
-      const dealerHand = this.state.dealerHand.cardFaceUp()
       return this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
     }
 
-    this.stayAction(dealerScore, playerScore, bet * 2)
+    this.stayAction(dealerHand, dealerScore, playerScore, bet * 2)
   }
 
-  stayAction(dealerScore, playerScore, bet) {
-    const dealerHand = this.state.dealerHand
-
+  stayAction(dealerHand, dealerScore, playerScore, bet) {
     if (dealerScore < 17) {
       const newCard = this.state.deck.drawCard()
       const newHand = dealerHand.addCard(newCard)
@@ -143,17 +142,23 @@ class Game extends React.Component {
         return this.setState({ result: result.resultMessage(), reward: bet, progress: 'finish' })
       }
 
-      return this.stayAction(newScore, playerScore, bet)
+      return this.stayAction(newHand, newScore, playerScore, bet)
     }
 
     const result = new ResultJudgment(playerScore, dealerScore)
 
-    // FIXME: 再代入
-    let resultState
-    if (result.isDealerVictory()) { resultState = { bet: 0, doubleDownBet: 0 } }
-    if (result.isPlayerVictory()) { resultState = { reward: bet } }
+    if (result.isDealerVictory()) {
+      return this.setState({
+        result: result.resultMessage(), bet: 0, doubleDownBet: 0, dealerHand: dealerHand.cardFaceUp(), progress: 'finish'
+      })
+    }
+    if (result.isPlayerVictory()) {
+      return this.setState({
+        result: result.resultMessage(), reward: bet, dealerHand: dealerHand.cardFaceUp(), progress: 'finish'
+      })
+    }
 
-    this.setState({ result: result.resultMessage(), ...resultState, dealerHand: dealerHand.cardFaceUp(), progress: 'finish' })
+    this.setState({ result: result.resultMessage(), dealerHand: dealerHand.cardFaceUp(), progress: 'finish' })
   }
 
   render() {
@@ -220,7 +225,7 @@ class Game extends React.Component {
               <button
                 className="stay-button"
                 disabled={this.state.progress !== 'start'}
-                onClick={() => { this.stayAction(dealerScore, playerScore, this.state.bet)}}
+                onClick={() => {this.stayAction(dealerHand, dealerScore, playerScore, this.state.bet)}}
               >
                 Stay
               </button>
