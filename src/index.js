@@ -32,6 +32,7 @@ class Game extends React.Component {
 
     const deck = new Deck(defaultCards)
 
+    // FIXME: 再代入
     let playerCards = []
     let dealerCards = []
 
@@ -45,6 +46,7 @@ class Game extends React.Component {
     const playerHand = new Hand(playerCards)
     const dealerHand = new Hand(dealerCards)
 
+    // FIXME: 再代入
     let resultMessage = ''
     let reward = 0
 
@@ -62,11 +64,12 @@ class Game extends React.Component {
       deck: deck,
       playerHand: playerHand,
       dealerHand: dealerHand,
-      handClose: resultMessage === '',
       result: resultMessage,
       chip: chip,
       bet: bet,
       reward: reward,
+      // FIXME: フラグ制御
+      handClose: resultMessage === '',
       betClose: bet > 0,
       doubleDown: false,
     }
@@ -94,13 +97,13 @@ class Game extends React.Component {
     const bet = this.state.bet
     const chip = this.state.chip - bet
 
-    this.state.playerHand.addCard(this.state.deck.drawCard())
-    this.setState({ chip: chip, doubleDown: true, playerHand: this.state.playerHand })
+    const newPlayerHand = this.state.playerHand.addCard(this.state.deck.drawCard())
+    this.setState({ chip: chip, doubleDown: true, playerHand: newPlayerHand })
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
 
-    const playerScore = new ScoreJudgment(this.state.playerHand.cards).score()
+    const playerScore = new ScoreJudgment(newPlayerHand.cards).score()
 
     if(playerScore > 21) {
       const result = new ResultJudgment(playerScore, dealerScore)
