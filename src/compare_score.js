@@ -11,14 +11,14 @@ export class CompareScore {
   }
 
   isPlayerVictory() {
-    if(this.playerScore > 21) { return false }
-    if(this.dealerScore > 21) { return true }
-    return this.playerScore > this.dealerScore
+    if(this.playerScore.isBurst()) { return false }
+    if(this.dealerScore.isBurst()) { return true }
+    return this.playerScore.value() > this.dealerScore.value()
   }
 
   isDealerVictory() {
-    if(this.dealerScore > 21) { return false }
-    if(this.playerScore > 21) { return true }
-    return this.dealerScore > this.playerScore
+    if(this.dealerScore.isBurst()) { return false }
+    if(this.playerScore.isBurst()) { return true }
+    return this.dealerScore.value() > this.playerScore.value()
   }
 }

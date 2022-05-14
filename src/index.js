@@ -4,7 +4,7 @@ import './index.css';
 
 import { Deck } from "./deck"
 import { Hand } from "./hand"
-import { CalculateValue } from "./calculate_value"
+import { CalculateScore } from "./calculate_score"
 import { CompareScore } from "./compare_score";
 
 // Component
@@ -48,11 +48,11 @@ class Game extends React.Component {
     const playerHand = new Hand([playerCard1, playerCard2])
     const dealerHand = new Hand([dealerCard1, dealerCard2])
 
-    const playerScore = new CalculateValue(playerHand.cards).score()
-    const dealerScore = new CalculateValue(dealerHand.cards).score()
+    const playerScore = new CalculateScore(playerHand.cards)
+    const dealerScore = new CalculateScore(dealerHand.cards)
 
     // 3. game finish blackjack
-    if (playerScore === 21 || dealerScore === 21) {
+    if (playerScore.isBlackJack() || dealerScore.isBlackJack()) {
       const result = new CompareScore(playerScore, dealerScore)
       const reward = result.isPlayerVictory() ? bet * 1.5 : 0
       const returnBet = result.isDealerVictory() ? 0 : bet
@@ -92,12 +92,13 @@ class Game extends React.Component {
   hitAction() {
     const newCard = this.state.deck.drawCard()
     const newHand = this.state.playerHand.addCard(newCard)
-    const newScore = new CalculateValue(newHand.cards).score()
+    const newScore = new CalculateScore(newHand.cards)
 
     this.setState({ playerHand: newHand })
 
-    if(newScore > 21) {
-      const result = new CompareScore(newScore, 0)
+    if(newScore.isBurst()) {
+      const dealerScore = new CalculateScore(this.state.dealerHand.cards)
+      const result = new CompareScore(newScore, dealerScore)
       const dealerHand = this.state.dealerHand.cardFaceUp()
       this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
     }
@@ -114,13 +115,13 @@ class Game extends React.Component {
 
     const newCard = this.state.deck.drawCard()
     const newHand = this.state.playerHand.addCard(newCard)
-    const playerScore = new CalculateValue(newHand.cards).score()
+    const playerScore = new CalculateScore(newHand.cards)
 
     this.setState({ playerHand: newHand })
 
     const dealerHand = this.state.dealerHand.cardFaceUp()
 
-    if(playerScore > 21) {
+    if(playerScore.isBurst()) {
       const result = new CompareScore(playerScore, dealerScore)
       return this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
     }
@@ -129,15 +130,15 @@ class Game extends React.Component {
   }
 
   stayAction(dealerHand, dealerScore, playerScore, bet) {
-    if (dealerScore < 17) {
+    if (dealerScore.isMustHit()) {
       const newCard = this.state.deck.drawCard()
       const newHand = dealerHand.addCard(newCard)
 
       this.setState({ dealerHand: newHand })
 
-      const newScore = new CalculateValue(newHand.cards).score()
+      const newScore = new CalculateScore(newHand.cards)
 
-      if (newScore > 21) {
+      if (newScore.isBurst()) {
         const result = new CompareScore(playerScore, newScore)
         return this.setState({ result: result.resultMessage(), reward: bet, progress: 'finish' })
       }
@@ -164,11 +165,11 @@ class Game extends React.Component {
   render() {
     // Dealer
     const dealerHand = this.state.dealerHand
-    const dealerScore = new CalculateValue(dealerHand.cards).score()
+    const dealerScore = new CalculateScore(dealerHand.cards)
 
     // Player
     const playerHand = this.state.playerHand
-    const playerScore = new CalculateValue(playerHand.cards).score()
+    const playerScore = new CalculateScore(playerHand.cards)
 
     return (
       <div className="game">
@@ -179,7 +180,7 @@ class Game extends React.Component {
         <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
-            <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealerScore : '---' }</div>
+            <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealerScore.value() : '---' }</div>
             <div className="dealer-hand">
               <HandCards cards={dealerHand.display()} deck={this.state.deck} />
             </div>
@@ -187,7 +188,7 @@ class Game extends React.Component {
           <div className="player">
             <Chip chip={this.state.bet} role="player-bet" />
             <Chip chip={this.state.doubleDownBet} role="double-down-bet" />
-            <div className="player-score">Player: { playerScore }</div>
+            <div className="player-score">Player: { playerScore.value() }</div>
             <div className="player-hand">
               <HandCards cards={playerHand.display()} deck={this.state.deck} />
             </div>

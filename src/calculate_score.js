@@ -1,9 +1,12 @@
-export class CalculateValue {
+export class CalculateScore {
+  static MAX_SCORE = 21
+  static MUST_HIT_SCORE = 17
+
   constructor(cards) {
     this.cards = cards
   }
 
-  score() {
+  value() {
     const cards = this.cards
 
     if (cards.length === 0) { return 0 }
@@ -19,11 +22,23 @@ export class CalculateValue {
       return sum + element
     })
 
-    while (totalScore > 21 && aceCount > 0) {
+    while (totalScore > CalculateScore.MAX_SCORE && aceCount > 0) {
       totalScore-= 10
       aceCount--
     }
 
     return totalScore
+  }
+
+  isBurst() {
+    return (this.value() > CalculateScore.MAX_SCORE)
+  }
+
+  isBlackJack() {
+    return (this.value() === CalculateScore.MAX_SCORE)
+  }
+
+  isMustHit() {
+    return (this.value() < CalculateScore.MUST_HIT_SCORE)
   }
 }
