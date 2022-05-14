@@ -14,6 +14,10 @@ export class Hand {
   cardFaceDown() {
     return new FaceDownHand(this.cards)
   }
+
+  cardFaceUp() {
+    return this
+  }
 }
 
 class FaceDownHand {
@@ -37,6 +41,10 @@ class FaceDownHand {
 
   addCard(card) {
     return new Hand(this.cards.concat(card))
+  }
+
+  cardFaceDown() {
+    return this
   }
 
   cardFaceUp() {
