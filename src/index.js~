@@ -81,7 +81,7 @@ class Game extends React.Component {
 
     if(newScore > 21) {
       const result = new ResultJudgment(newScore, 0)
-      this.setState({ result: result.resultMessage(), handClose: false, bet: 0, doubleDownBet: 0 })
+      this.setState({ result: result.resultMessage(), handClose: false, bet: 0 })
     }
   }
 
@@ -99,7 +99,7 @@ class Game extends React.Component {
 
     if(playerScore > 21) {
       const result = new ResultJudgment(playerScore, dealerScore)
-      return this.setState({ result: result.resultMessage(), handClose: false, bet: 0, doubleDownBet: 0 })
+      return this.setState({ result: result.resultMessage(), handClose: false, bet: 0 })
     }
 
     this.stayAction(dealerScore, playerScore, bet * 2)
