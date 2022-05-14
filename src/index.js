@@ -147,7 +147,7 @@ class Game extends React.Component {
 
     const dealerScore = new ScoreJudgment(dealerHand.cards).score()
 
-    if (dealerHand.cards.length > 0) { dealerHand.cardFaceDown(this.state.handClose) }
+    const displayDealerHand = this.state.handClose ? dealerHand.cardFaceDown() : dealerHand
 
     // Player
     const playerScore = new ScoreJudgment(this.state.playerHand.cards).score()
@@ -163,7 +163,7 @@ class Game extends React.Component {
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
             <div className="dealer-hand">
-              <HandCards cards={this.state.dealerHand.display()} deck={this.state.deck} />
+              <HandCards cards={displayDealerHand.display()} deck={this.state.deck} />
             </div>
           </div>
           <div className="player">
