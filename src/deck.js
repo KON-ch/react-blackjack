@@ -4,9 +4,11 @@ export class Deck {
   }
 
   drawCard() {
-    return this.cards.splice(this.#randomNumber(this.cards.length), 1)
+    // FIXME: 破壊的
+    return this.cards.splice(this.#randomNumber(this.cards.length), 1)[0]
   }
 
+  // FIXME:表示カラーの責務
   suitColor(card) {
     if (card.suit === 'spade' || card.suit === 'club') { return 'black' }
     if (card.suit === 'heart' || card.suit === 'diamond') { return '#d30000' }
