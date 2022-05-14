@@ -1,14 +1,14 @@
 export class ScoreJudgment {
-  constructor(hands) {
-    this.hands = hands
+  constructor(cards) {
+    this.cards = cards
   }
 
   score() {
-    const hands = this.hands
+    const cards = this.cards
 
-    if (hands.length === 0) { return 0 }
+    if (cards.length === 0) { return 0 }
 
-    const handValues = hands.map((card) => {
+    const handValues = cards.map((card) => {
       return card.value
     })
 

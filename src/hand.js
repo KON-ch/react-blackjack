@@ -1,19 +1,19 @@
 export class Hand {
-  constructor(hands) {
-    this.hands = hands
+  constructor(cards) {
+    this.cards = cards
     this.faceDown = false
     this.faceDownCard = { number: 0, value: 0, displayCode: 127136, suit: '' }
   }
 
   display() {
-    if (this.faceDown && this.hands.length === 2) {
-      return [this.hands[0], this.faceDownCard]
+    if (this.faceDown && this.cards.length === 2) {
+      return [this.cards[0], this.faceDownCard]
     }
-    return this.hands
+    return this.cards
   }
 
   addCard(card) {
-    return new Hand(this.hands.concat(card))
+    return new Hand(this.cards.concat(card))
   }
 
   cardFaceDown(boolean) {
