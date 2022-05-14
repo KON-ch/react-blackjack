@@ -41,6 +41,7 @@ class Game extends React.Component {
     // FIXME: 再代入
     let resultMessage = ''
     let reward = 0
+    let progress = bet === 0 ? 'setup' : 'start'
 
     const playerScore = new ScoreJudgment(playerHand.cards).score()
     const dealerScore = new ScoreJudgment(dealerHand.cards).score()
@@ -50,6 +51,7 @@ class Game extends React.Component {
       resultMessage = result.resultMessage()
       if (result.isPlayerVictory()) { reward = bet * 1.5 }
       if (result.isDealerVictory()) { bet = 0 }
+      progress = 'finish'
     }
 
     return {
@@ -61,8 +63,7 @@ class Game extends React.Component {
       bet: bet,
       reward: reward,
       doubleDownBet: 0,
-      // FIXME: フラグ制御
-      betClose: bet > 0,
+      progress: progress
     }
   }
 
@@ -81,7 +82,7 @@ class Game extends React.Component {
     if(newScore > 21) {
       const result = new ResultJudgment(newScore, 0)
       const dealerHand = this.state.dealerHand.cardFaceUp()
-      this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0 })
+      this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
     }
   }
 
@@ -89,18 +90,21 @@ class Game extends React.Component {
     const bet = this.state.bet
     const chip = this.state.chip - bet
 
-    const newPlayerHand = this.state.playerHand.addCard(this.state.deck.drawCard())
-    this.setState({ chip: chip, doubleDownBet: bet, playerHand: newPlayerHand })
+    this.setState({ chip: chip, doubleDownBet: bet })
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
 
-    const playerScore = new ScoreJudgment(newPlayerHand.cards).score()
+    const newCard = this.state.deck.drawCard()
+    const newHand = this.state.playerHand.addCard(newCard)
+    const playerScore = new ScoreJudgment(newHand.cards).score()
+
+    this.setState({ playerHand: newHand })
 
     if(playerScore > 21) {
       const result = new ResultJudgment(playerScore, dealerScore)
       const dealerHand = this.state.dealerHand.cardFaceUp()
-      return this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0 })
+      return this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
     }
 
     this.stayAction(dealerScore, playerScore, bet * 2)
@@ -117,7 +121,7 @@ class Game extends React.Component {
 
       if (newScore > 21) {
         const result = new ResultJudgment(playerScore, newScore)
-        return this.setState({ result: result.resultMessage(), reward: bet })
+        return this.setState({ result: result.resultMessage(), reward: bet, progress: 'finish' })
       }
 
       return this.stayAction(newScore, playerScore, bet)
@@ -130,7 +134,7 @@ class Game extends React.Component {
     if (result.isDealerVictory()) { resultState = { bet: 0, doubleDownBet: 0 } }
     if (result.isPlayerVictory()) { resultState = { reward: bet } }
 
-    this.setState({ result: result.resultMessage(), ...resultState })
+    this.setState({ result: result.resultMessage(), ...resultState, progress: 'finish' })
   }
 
   render() {
@@ -151,7 +155,7 @@ class Game extends React.Component {
         <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
-            <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
+            <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealerScore : '---' }</div>
             <div className="dealer-hand">
               <HandCards cards={dealerHand.display()} deck={this.state.deck} />
             </div>
@@ -166,14 +170,14 @@ class Game extends React.Component {
             <div className="player-action">
               <button
                 className="bet-button"
-                disabled={this.state.betClose}
+                disabled={this.state.progress !== 'setup'}
                 onClick={ () => { this.setState({ chip: this.state.chip - 5, bet: this.state.bet + 5 }) }}
               >
                 Bet
               </button>
               <button
                 className="start-button"
-                disabled={(this.state.bet === 0 || this.state.playerHand.cards.length !== 0)}
+                disabled={this.state.bet === 0 || this.state.progress !== 'setup'}
                 onClick={ () => {
                   this.setState(this.setup(this.state.chip, this.state.bet))
                 }}
@@ -182,28 +186,28 @@ class Game extends React.Component {
               </button>
               <button
                 className="hit-button"
-                disabled={(!this.state.betClose || this.state.result !== '')}
+                disabled={this.state.progress !== 'start'}
                 onClick={ () => this.hitAction() }
               >
                 Hit
               </button>
               <button
                 className="double-button"
-                disabled={(!this.state.betClose || this.state.result !== '')}
+                disabled={this.state.progress !== 'start'}
                 onClick={ () => this.doubleAction(dealerScore) }
               >
                 Double
               </button>
               <button
                 className="stay-button"
-                disabled={(!this.state.betClose || this.state.result !== '')}
+                disabled={this.state.progress !== 'start'}
                 onClick={() => { this.stayAction(dealerScore, playerScore, this.state.bet)}}
               >
                 Stay
               </button>
               <button
                 className="restart-button"
-                disabled={this.state.result === ''}
+                disabled={this.state.progress !== 'finish'}
                 onClick={() => { this.setState(this.setup(this.state.chip + this.state.bet + this.state.doubleDownBet + this.state.reward, 0)) }}
               >
                 Restart
