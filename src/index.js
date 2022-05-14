@@ -24,46 +24,63 @@ class Game extends React.Component {
 
     const deck = new Deck(defaultCards)
 
-    // FIXME: 再代入
-    let playerCards = []
-    let dealerCards = []
-
-    if (bet > 0) {
-      playerCards = playerCards.concat(deck.drawCard())
-      dealerCards = dealerCards.concat(deck.drawCard())
-      playerCards = playerCards.concat(deck.drawCard())
-      dealerCards = dealerCards.concat(deck.drawCard())
+    // 1. no bet
+    if (bet === 0) {
+      return {
+        deck: deck,
+        playerHand: new Hand([]),
+        dealerHand: new Hand([]),
+        result: '',
+        chip: chip,
+        bet: bet,
+        reward: 0,
+        doubleDownBet: 0,
+        progress: 'setup'
+      }
     }
 
-    const playerHand = new Hand(playerCards)
-    const dealerHand = new Hand(dealerCards).cardFaceDown()
+    // 2. game setup
+    const playerCard1 = deck.drawCard()
+    const dealerCard1 = deck.drawCard()
+    const playerCard2 = deck.drawCard()
+    const dealerCard2 = deck.drawCard()
 
-    // FIXME: 再代入
-    let resultMessage = ''
-    let reward = 0
-    let progress = bet === 0 ? 'setup' : 'start'
+    const playerHand = new Hand([playerCard1, playerCard2])
+    const dealerHand = new Hand([dealerCard1, dealerCard2]).cardFaceDown()
 
     const playerScore = new ScoreJudgment(playerHand.cards).score()
     const dealerScore = new ScoreJudgment(dealerHand.cards).score()
 
+    // 3. game finish blackjack
     if (playerScore === 21 || dealerScore === 21) {
       const result = new ResultJudgment(playerScore, dealerScore)
-      resultMessage = result.resultMessage()
-      if (result.isPlayerVictory()) { reward = bet * 1.5 }
-      if (result.isDealerVictory()) { bet = 0 }
-      progress = 'finish'
+      const reward = result.isPlayerVictory() ? bet * 1.5 : 0
+      const returnBet = result.isDealerVictory() ? 0 : bet
+
+      return {
+        deck: deck,
+        playerHand: playerHand,
+        dealerHand: dealerHand.cardFaceUp(),
+        result: result.resultMessage(),
+        chip: chip,
+        bet: returnBet,
+        reward: reward,
+        doubleDownBet: 0,
+        progress: 'finish'
+      }
     }
 
+    // 4. game start
     return {
       deck: deck,
       playerHand: playerHand,
       dealerHand: dealerHand,
-      result: resultMessage,
+      result: '',
       chip: chip,
       bet: bet,
-      reward: reward,
+      reward: 0,
       doubleDownBet: 0,
-      progress: progress
+      progress: 'start'
     }
   }
 
