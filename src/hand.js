@@ -38,4 +38,8 @@ class FaceDownHand {
   addCard(card) {
     return new Hand(this.cards.concat(card))
   }
+
+  cardFaceUp() {
+    return new Hand(this.cards)
+  }
 }

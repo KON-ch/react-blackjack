@@ -36,7 +36,7 @@ class Game extends React.Component {
     }
 
     const playerHand = new Hand(playerCards)
-    const dealerHand = new Hand(dealerCards)
+    const dealerHand = new Hand(dealerCards).cardFaceDown()
 
     // FIXME: 再代入
     let resultMessage = ''
@@ -62,7 +62,6 @@ class Game extends React.Component {
       reward: reward,
       doubleDownBet: 0,
       // FIXME: フラグ制御
-      handClose: resultMessage === '',
       betClose: bet > 0,
     }
   }
@@ -81,7 +80,8 @@ class Game extends React.Component {
 
     if(newScore > 21) {
       const result = new ResultJudgment(newScore, 0)
-      this.setState({ result: result.resultMessage(), handClose: false, bet: 0, doubleDownBet: 0 })
+      const dealerHand = this.state.dealerHand.cardFaceUp()
+      this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0 })
     }
   }
 
@@ -99,15 +99,14 @@ class Game extends React.Component {
 
     if(playerScore > 21) {
       const result = new ResultJudgment(playerScore, dealerScore)
-      return this.setState({ result: result.resultMessage(), handClose: false, bet: 0, doubleDownBet: 0 })
+      const dealerHand = this.state.dealerHand.cardFaceUp()
+      return this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0 })
     }
 
     this.stayAction(dealerScore, playerScore, bet * 2)
   }
 
   stayAction(dealerScore, playerScore, bet) {
-    this.setState({ handClose: false })
-
     if (dealerScore < 17) {
       const newCard = this.state.deck.drawCard()
       const newHand = this.state.dealerHand.addCard(newCard)
@@ -137,13 +136,11 @@ class Game extends React.Component {
   render() {
     // Dealer
     const dealerHand = this.state.dealerHand
-
     const dealerScore = new ScoreJudgment(dealerHand.cards).score()
 
-    const displayDealerHand = this.state.handClose ? dealerHand.cardFaceDown() : dealerHand
-
     // Player
-    const playerScore = new ScoreJudgment(this.state.playerHand.cards).score()
+    const playerHand = this.state.playerHand
+    const playerScore = new ScoreJudgment(playerHand.cards).score()
 
     return (
       <div className="game">
@@ -156,7 +153,7 @@ class Game extends React.Component {
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.handClose ? '---' : dealerScore }</div>
             <div className="dealer-hand">
-              <HandCards cards={displayDealerHand.display()} deck={this.state.deck} />
+              <HandCards cards={dealerHand.display()} deck={this.state.deck} />
             </div>
           </div>
           <div className="player">
@@ -164,7 +161,7 @@ class Game extends React.Component {
             <Chip chip={this.state.doubleDownBet} role="double-down-bet" />
             <div className="player-score">Player: { playerScore }</div>
             <div className="player-hand">
-              <HandCards cards={this.state.playerHand.display()} deck={this.state.deck} />
+              <HandCards cards={playerHand.display()} deck={this.state.deck} />
             </div>
             <div className="player-action">
               <button
