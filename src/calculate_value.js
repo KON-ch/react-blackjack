@@ -1,4 +1,4 @@
-export class ScoreJudgment {
+export class CalculateValue {
   constructor(cards) {
     this.cards = cards
   }
@@ -12,6 +12,7 @@ export class ScoreJudgment {
       return card.value
     })
 
+    // FIXME: 再代入
     let aceCount = handValues.filter((value) => value === 11).length
 
     let totalScore = handValues.reduce((sum, element) => {

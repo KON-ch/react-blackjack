@@ -4,7 +4,7 @@ import './index.css';
 
 import { Deck } from "./deck"
 import { Hand } from "./hand"
-import { ScoreJudgment } from "./score_judgment"
+import { CalculateValue } from "./calculate_value"
 import { ResultJudgment } from "./result_judgment";
 
 // Component
@@ -48,8 +48,8 @@ class Game extends React.Component {
     const playerHand = new Hand([playerCard1, playerCard2])
     const dealerHand = new Hand([dealerCard1, dealerCard2])
 
-    const playerScore = new ScoreJudgment(playerHand.cards).score()
-    const dealerScore = new ScoreJudgment(dealerHand.cards).score()
+    const playerScore = new CalculateValue(playerHand.cards).score()
+    const dealerScore = new CalculateValue(dealerHand.cards).score()
 
     // 3. game finish blackjack
     if (playerScore === 21 || dealerScore === 21) {
@@ -92,7 +92,7 @@ class Game extends React.Component {
   hitAction() {
     const newCard = this.state.deck.drawCard()
     const newHand = this.state.playerHand.addCard(newCard)
-    const newScore = new ScoreJudgment(newHand.cards).score()
+    const newScore = new CalculateValue(newHand.cards).score()
 
     this.setState({ playerHand: newHand })
 
@@ -114,7 +114,7 @@ class Game extends React.Component {
 
     const newCard = this.state.deck.drawCard()
     const newHand = this.state.playerHand.addCard(newCard)
-    const playerScore = new ScoreJudgment(newHand.cards).score()
+    const playerScore = new CalculateValue(newHand.cards).score()
 
     this.setState({ playerHand: newHand })
 
@@ -135,7 +135,7 @@ class Game extends React.Component {
 
       this.setState({ dealerHand: newHand })
 
-      const newScore = new ScoreJudgment(newHand.cards).score()
+      const newScore = new CalculateValue(newHand.cards).score()
 
       if (newScore > 21) {
         const result = new ResultJudgment(playerScore, newScore)
@@ -164,11 +164,11 @@ class Game extends React.Component {
   render() {
     // Dealer
     const dealerHand = this.state.dealerHand
-    const dealerScore = new ScoreJudgment(dealerHand.cards).score()
+    const dealerScore = new CalculateValue(dealerHand.cards).score()
 
     // Player
     const playerHand = this.state.playerHand
-    const playerScore = new ScoreJudgment(playerHand.cards).score()
+    const playerScore = new CalculateValue(playerHand.cards).score()
 
     return (
       <div className="game">
