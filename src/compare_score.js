@@ -1,4 +1,4 @@
-export class ResultJudgment {
+export class CompareScore {
   constructor(playerScore, dealerScore) {
     this.playerScore = playerScore
     this.dealerScore = dealerScore

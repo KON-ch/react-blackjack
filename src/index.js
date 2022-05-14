@@ -5,7 +5,7 @@ import './index.css';
 import { Deck } from "./deck"
 import { Hand } from "./hand"
 import { CalculateValue } from "./calculate_value"
-import { ResultJudgment } from "./result_judgment";
+import { CompareScore } from "./compare_score";
 
 // Component
 import { HandCards } from "./hand_cards";
@@ -53,7 +53,7 @@ class Game extends React.Component {
 
     // 3. game finish blackjack
     if (playerScore === 21 || dealerScore === 21) {
-      const result = new ResultJudgment(playerScore, dealerScore)
+      const result = new CompareScore(playerScore, dealerScore)
       const reward = result.isPlayerVictory() ? bet * 1.5 : 0
       const returnBet = result.isDealerVictory() ? 0 : bet
 
@@ -97,7 +97,7 @@ class Game extends React.Component {
     this.setState({ playerHand: newHand })
 
     if(newScore > 21) {
-      const result = new ResultJudgment(newScore, 0)
+      const result = new CompareScore(newScore, 0)
       const dealerHand = this.state.dealerHand.cardFaceUp()
       this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
     }
@@ -121,7 +121,7 @@ class Game extends React.Component {
     const dealerHand = this.state.dealerHand.cardFaceUp()
 
     if(playerScore > 21) {
-      const result = new ResultJudgment(playerScore, dealerScore)
+      const result = new CompareScore(playerScore, dealerScore)
       return this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
     }
 
@@ -138,14 +138,14 @@ class Game extends React.Component {
       const newScore = new CalculateValue(newHand.cards).score()
 
       if (newScore > 21) {
-        const result = new ResultJudgment(playerScore, newScore)
+        const result = new CompareScore(playerScore, newScore)
         return this.setState({ result: result.resultMessage(), reward: bet, progress: 'finish' })
       }
 
       return this.stayAction(newHand, newScore, playerScore, bet)
     }
 
-    const result = new ResultJudgment(playerScore, dealerScore)
+    const result = new CompareScore(playerScore, dealerScore)
 
     if (result.isDealerVictory()) {
       return this.setState({
