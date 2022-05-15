@@ -32,7 +32,6 @@ class Game extends React.Component {
         chip: chip,
         reward: 0,
         progress: 'setup',
-        result: '',
         players: [{
           hand: new Hand([]),
           bet: 0,
@@ -66,7 +65,6 @@ class Game extends React.Component {
         chip: chip,
         reward: reward,
         progress: 'finish',
-        result: result.resultMessage(),
         players: [{
           hand: playerHand,
           bet: returnBet,
@@ -83,7 +81,6 @@ class Game extends React.Component {
       chip: chip,
       reward: 0,
       progress: 'start',
-      result: '',
       players: [{
         hand: playerHand,
         bet: bet,
@@ -113,13 +110,10 @@ class Game extends React.Component {
     })
 
     if(newScore.isBurst()) {
-      const dealerScore = new CalculateScore(this.state.dealerHand.cards)
-      const result = new CompareScore(newScore, dealerScore)
       const dealerHand = this.state.dealerHand.cardFaceUp()
       this.setState({
         dealerHand: dealerHand,
         progress: 'finish',
-        result: result.resultMessage(),
         players: this.state.players.map((player) => {
           if (player !== currentPlayer) {
             return player
@@ -165,11 +159,9 @@ class Game extends React.Component {
 
 
     if(playerScore.isBurst()) {
-      const result = new CompareScore(playerScore, dealerScore)
       return this.setState({
         dealerHand: dealerHand,
         progress: 'finish',
-        result: result.resultMessage(),
         players: [
           { hand: newHand, bet: 0, doubleDownBet: 0 }
         ]
@@ -195,11 +187,9 @@ class Game extends React.Component {
       const newScore = new CalculateScore(newHand.cards)
 
       if (newScore.isBurst()) {
-        const result = new CompareScore(playerScore, newScore)
         return this.setState({
           progress: 'finish',
           reward: player.bet + player.doubleDownBet,
-          result: result.resultMessage(),
         })
       }
 
@@ -212,7 +202,6 @@ class Game extends React.Component {
       return this.setState({
         dealerHand: dealerHand.cardFaceUp(),
         progress: 'finish',
-        result: result.resultMessage(),
         players: [
           { hand: player.hand, bet: 0, doubleDownBet: 0 }
         ]
@@ -224,14 +213,12 @@ class Game extends React.Component {
         dealerHand: dealerHand.cardFaceUp(),
         progress: 'finish',
         reward: player.bet + player.doubleDownBet,
-        result: result.resultMessage(),
       })
     }
 
     this.setState({
       dealerHand: dealerHand.cardFaceUp(),
       progress: 'finish',
-      result: result.resultMessage()
     })
   }
 
@@ -247,9 +234,6 @@ class Game extends React.Component {
 
     return (
       <div className="game">
-        <div className="game-result">
-          { this.state.result }
-        </div>
         <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
@@ -284,7 +268,7 @@ class Game extends React.Component {
                 this.setState({
                   chip: this.state.chip - 50,
                   players: [
-                    { hand: currentPlayer.hand, result: '', bet: currentPlayer.bet + 50, doubleDownBet: 0 }
+                    { hand: currentPlayer.hand, bet: currentPlayer.bet + 50, doubleDownBet: 0 }
                   ]
                 })
               }}

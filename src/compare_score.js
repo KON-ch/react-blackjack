@@ -4,12 +4,6 @@ export class CompareScore {
     this.dealerScore = dealerScore
   }
 
-  resultMessage() {
-    if (this.isPlayerVictory()) { return 'Winner: Player' }
-    if (this.isDealerVictory()) { return 'Winner: Dealer' }
-    return 'Result is Draw'
-  }
-
   isPlayerVictory() {
     if(this.playerScore.isBurst()) { return false }
     if(this.dealerScore.isBurst()) { return true }
