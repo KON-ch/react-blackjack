@@ -1,0 +1,10 @@
+.hand-cards{
+  font-size: 120px;
+  display: inline-block;
+}
+.dealer-hand {
+  height: 180px;
+}
+.player-hand {
+  height: 180px;
+}

@@ -4,76 +4,25 @@
   text-align: center;
   min-height: 48px;
 }
-.game-chip {
-  background-image: url('../public/chip.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  position: fixed;
-  top: 50px;
-  left: 85%;
-  height: 148px;
-  width: 148px;
-  text-align: center;
-}
-.reward-chip{
-  background-image: url('../public/chip.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  position: fixed;
-  top: 300px;
-  left: 10%;
-  height: 148px;
-  width: 148px;
-  text-align: center;
-}
-.point {
-  font-weight: bold;
-  display: inline-block;
-  margin-top: 57px;
-  font-size: 24px;
-}
 .dealer {
   text-align: center;
 }
 .dealer-score {
   font-size: 32px;
 }
-.dealer-hand {
-  font-size: 172px;
-  height: 228px;
-}
 .player {
   text-align: center;
   margin-top: 16px;
 }
-.player-bet {
-  background-image: url('../public/chip.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  position: fixed;
-  top: 480px;
-  left: 10%;
-  height: 148px;
-  width: 148px;
-  text-align: center;
-}
-.double-down-bet {
-  background-image: url('../public/chip.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  position: fixed;
-  top: 480px;
-  left: 20%;
-  height: 148px;
-  width: 148px;
-  text-align: center;
+.player-field {
+  height: 350px;
 }
 .player-score {
   font-size: 32px;
 }
-.player-hand {
-  font-size: 172px;
-  height: 256px;
+.player-chips {
+  display: flex;
+  justify-content: center;
 }
 .bet-button, .start-button, .hit-button, .double-button, .stay-button, .restart-button {
   margin: 0 12px;

@@ -1,33 +1,21 @@
 export class Deck {
-  constructor() {
-    this.cards = [
-      { 11: 127137 }, { 2: 127138 }, { 3: 127139 }, { 4: 127140 }, { 5: 127141 }, { 6: 127142 }, { 7: 127143 }, { 8: 127144 }, { 9: 127145 }, { 10: 127146 }, { 10: 127147 }, { 10: 127149 }, { 10: 127150 },
-      { 11: 127153 }, { 2: 127154 }, { 3: 127155 }, { 4: 127156 }, { 5: 127157 }, { 6: 127158 }, { 7: 127159 }, { 8: 127160 }, { 9: 127161 }, { 10: 127162 }, { 10: 127163 }, { 10: 127165 }, { 10: 127166 },
-      { 11: 127169 }, { 2: 127170 }, { 3: 127171 }, { 4: 127172 }, { 5: 127173 }, { 6: 127174 }, { 7: 127175 }, { 8: 127176 }, { 9: 127177 }, { 10: 127178 }, { 10: 127179 }, { 10: 127181 }, { 10: 127182 },
-      { 11: 127185 }, { 2: 127186 }, { 3: 127187 }, { 4: 127188 }, { 5: 127189 }, { 6: 127190 }, { 7: 127191 }, { 8: 127192 }, { 9: 127193 }, { 10: 127194 }, { 10: 127195 }, { 10: 127197 }, { 10: 127198 },
-    ]
+  constructor(cards) {
+    this.cards = cards
   }
 
   drawCard() {
-    return this.cards.splice(this.randomNumber(this.cards.length), 1)
+    // FIXME: 破壊的
+    return this.cards.splice(this.#randomNumber(this.cards.length), 1)[0]
   }
 
+  // FIXME:表示カラーの責務
   suitColor(card) {
-    const cardNumber = Number(Object.values(card))
-
-    if(cardNumber === 127136) { return { color: 'green' } }
-
-    if (cardNumber < 127151 || cardNumber > 127182) { return { color: 'black' } }
-    return { color: '#d30000' }
+    if (card.suit === 'spade' || card.suit === 'club') { return 'black' }
+    if (card.suit === 'heart' || card.suit === 'diamond') { return '#d30000' }
+    return 'green'
   }
 
-  faceDownCard() {
-    return { 0: '127136' }
-  }
-
-  randomNumber(totalCount) {
-    return (
-      Math.floor(Math.random() * totalCount - 1) + 1
-    )
+  #randomNumber(totalCount) {
+    return Math.floor(Math.random() * totalCount - 1) + 1
   }
 }

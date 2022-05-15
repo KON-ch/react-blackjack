@@ -1,4 +1,5 @@
 import React from "react";
+import './chip.css'
 
 export class Chip extends React.Component {
   render() {
@@ -7,7 +8,7 @@ export class Chip extends React.Component {
     if (chip === 0) { return }
 
     return (
-      <div className={this.props.role}>
+      <div className={`chip ${this.props.role}`}>
         <span className="point">
           { chip }
         </span>
