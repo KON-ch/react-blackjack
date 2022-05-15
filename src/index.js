@@ -194,14 +194,14 @@ class Game extends React.Component {
             </div>
             <div className="player-action">
               <button
-                className="bet-button"
+                className="button bet-button"
                 disabled={this.state.progress !== 'setup'}
                 onClick={ () => { this.setState({ chip: this.state.chip - 50, bet: this.state.bet + 50 }) }}
               >
                 Bet
               </button>
               <button
-                className="start-button"
+                className="button start-button"
                 disabled={this.state.bet === 0 || this.state.progress !== 'setup'}
                 onClick={ () => {
                   this.setState(this.setup(this.state.chip, this.state.bet))
@@ -210,28 +210,35 @@ class Game extends React.Component {
                 Start
               </button>
               <button
-                className="hit-button"
+                className="button hit-button"
                 disabled={this.state.progress !== 'start'}
                 onClick={ () => this.hitAction() }
               >
                 Hit
               </button>
               <button
-                className="double-button"
+                className="button double-button"
                 disabled={this.state.progress !== 'start'}
                 onClick={ () => this.doubleAction(dealerScore) }
               >
                 Double
               </button>
               <button
-                className="stay-button"
+                className="button split-button"
+                disabled={!playerHand.isSplitEnable()}
+                onClick={ () => null }
+              >
+                Split
+              </button>
+              <button
+                className="button stay-button"
                 disabled={this.state.progress !== 'start'}
                 onClick={() => {this.stayAction(dealerHand, dealerScore, playerScore, this.state.bet)}}
               >
                 Stay
               </button>
               <button
-                className="restart-button"
+                className="button restart-button"
                 disabled={this.state.progress !== 'finish'}
                 onClick={() => { this.setState(this.setup(this.state.chip + this.state.bet + this.state.doubleDownBet + this.state.reward, 0)) }}
               >

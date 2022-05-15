@@ -24,7 +24,7 @@
   display: flex;
   justify-content: center;
 }
-.bet-button, .start-button, .hit-button, .double-button, .stay-button, .restart-button {
+.button {
   margin: 0 12px;
   font-size: 24px;
   width: 128px;
