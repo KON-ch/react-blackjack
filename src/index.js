@@ -95,15 +95,18 @@ class Game extends React.Component {
     this.state = this.setup(1000, 0)
   }
 
-  hitAction(player) {
+  hitAction(currentPlayer) {
     const newCard = this.state.deck.drawCard()
-    const newHand = player.hand.addCard(newCard)
+    const newHand = currentPlayer.hand.addCard(newCard)
     const newScore = new CalculateScore(newHand.cards)
 
     this.setState({
-      players: [
-        { hand: newHand, bet: player.bet, doubleDownBet: player.doubleDownBet }
-      ]
+      players: this.state.players.map((player) => {
+        if (player !== currentPlayer) {
+          return player
+        }
+        return { hand: newHand, bet: currentPlayer.bet, doubleDownBet: currentPlayer.doubleDownBet }
+      })
     })
 
     if(newScore.isBurst()) {
@@ -114,9 +117,12 @@ class Game extends React.Component {
         dealerHand: dealerHand,
         progress: 'finish',
         result: result.resultMessage(),
-        players: [
-          { hand: newHand, bet: 0, doubleDownBet: 0 }
-        ]
+        players: this.state.players.map((player) => {
+          if (player !== currentPlayer) {
+            return player
+          }
+          return { hand: newHand, bet: 0, doubleDownBet: 0 }
+        })
       })
     }
   }
@@ -229,6 +235,8 @@ class Game extends React.Component {
 
     // Player
     const currentPlayer = this.state.players[0]
+    // 右側のプレイヤーからアクションを行う為、表示順を反転している
+    const displayPlayers = [...this.state.players].reverse()
 
     return (
       <div className="game">
@@ -243,8 +251,7 @@ class Game extends React.Component {
           </div>
           <div className="player">
             {
-              // 右側のプレイヤーからアクションを行う為、表示順を反転している
-              this.state.players.reverse().map((player, index) => {
+              displayPlayers.map((player, index) => {
                 const playerHand = player.hand
                 const playerScore = new CalculateScore(playerHand.cards)
 
