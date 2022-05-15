@@ -100,23 +100,20 @@ class Game extends React.Component {
     const newHand = currentPlayer.hand.addCard(newCard)
     const newScore = new CalculateScore(newHand.cards)
 
+    const newPlayers = this.state.players.map((player) => {
+      if (player !== currentPlayer) {
+        return player
+      }
+      return newScore.isBurst() ?
+        { hand: newHand, bet: 0, doubleDownBet: 0, reward: 0 } :
+        { hand: newHand, bet: currentPlayer.bet, doubleDownBet: currentPlayer.doubleDownBet, reward: 0 }
+    })
+
     this.setState({
-      players: this.state.players.map((player) => {
-        if (player !== currentPlayer) {
-          return player
-        }
-        return { hand: newHand, bet: currentPlayer.bet, doubleDownBet: currentPlayer.doubleDownBet, reward: 0 }
-      })
+      players: newPlayers
     })
 
     if(newScore.isBurst()) {
-      const newPlayers = this.state.players.map((player) => {
-        if (player !== currentPlayer) {
-          return player
-        }
-        return { hand: newHand, bet: 0, doubleDownBet: 0, reward: 0 }
-      })
-
       if (this.state.currentPlayer < (this.state.players.length - 1)) {
         return this.setState({
           currentPlayer: this.state.currentPlayer + 1, players: newPlayers
@@ -164,29 +161,32 @@ class Game extends React.Component {
 
     const newPlayers = this.state.players.map((player) => {
       if (player !== currentPlayer) { return player }
-      return { hand: newHand, bet: bet, doubleDownBet: bet, reward: 0 }
+      return playerScore.isBurst() ?
+        { hand: newHand, bet: 0, doubleDownBet: 0, reward: 0 } :
+        { hand: newHand, bet: bet, doubleDownBet: bet, reward: 0 }
     })
 
-    this.setState({
-      chip: chip,
-      players: newPlayers
-    })
+    this.setState({ chip: chip, players: newPlayers })
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
 
     const dealerHand = this.state.dealerHand.cardFaceUp()
 
-
     if(playerScore.isBurst()) {
-      return this.setState({
-        dealerHand: dealerHand,
-        progress: 'finish',
-        players: this.state.players.map((player) => {
-          if (player !== currentPlayer) { return player }
-          return { hand: newHand, bet: 0, doubleDownBet: 0, reward: 0 }
+      if (this.state.currentPlayer < (this.state.players.length - 1)) {
+        return this.setState({
+          currentPlayer: this.state.currentPlayer + 1, players: newPlayers
         })
-      })
+      }
+
+      if (newPlayers.every((player) => { return (player.bet === 0) })) {
+        return this.setState({
+          dealerHand: dealerHand,
+          progress: 'finish',
+          players: newPlayers
+        })
+      }
     }
 
     this.stayAction(dealerHand, dealerScore, newPlayers)
