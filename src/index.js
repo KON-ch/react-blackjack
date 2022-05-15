@@ -137,19 +137,22 @@ class Game extends React.Component {
     })
   }
 
-  async doubleAction(dealerScore, player) {
-    const bet = player.bet
+  async doubleAction(dealerScore, currentPlayer) {
+    const bet = currentPlayer.bet
     const chip = this.state.chip - bet
 
     const newCard = this.state.deck.drawCard()
-    const newHand = player.hand.addCard(newCard)
+    const newHand = currentPlayer.hand.addCard(newCard)
     const playerScore = new CalculateScore(newHand.cards)
 
-    const newPlayer = { hand: newHand, bet: player.bet, doubleDownBet: bet }
+    const newPlayer = { hand: newHand, bet: bet, doubleDownBet: bet }
 
     this.setState({
       chip: chip,
-      players: [newPlayer]
+      players: this.state.players.map((player) => {
+        if (player !== currentPlayer) { return player }
+        return newPlayer
+      })
     })
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -162,9 +165,10 @@ class Game extends React.Component {
       return this.setState({
         dealerHand: dealerHand,
         progress: 'finish',
-        players: [
-          { hand: newHand, bet: 0, doubleDownBet: 0 }
-        ]
+        players: this.state.players.map((player) => {
+          if (player !== currentPlayer) { return player }
+          return { hand: newHand, bet: 0, doubleDownBet: 0 }
+        })
       })
     }
 
