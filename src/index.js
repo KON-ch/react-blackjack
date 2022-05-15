@@ -37,7 +37,8 @@ class Game extends React.Component {
           hand: new Hand([]),
           bet: 0,
           doubleDownBet: 0,
-        }]
+        }],
+        currentPlayer: 0
       }
     }
 
@@ -70,7 +71,8 @@ class Game extends React.Component {
           hand: playerHand,
           bet: returnBet,
           doubleDownBet: 0,
-        }]
+        }],
+        currentPlayer: 0,
       }
     }
 
@@ -86,7 +88,8 @@ class Game extends React.Component {
         hand: playerHand,
         bet: bet,
         doubleDownBet: 0,
-      }]
+      }],
+      currentPlayer: 0
     }
   }
 
@@ -177,6 +180,10 @@ class Game extends React.Component {
   }
 
   stayAction(dealerHand, dealerScore, player) {
+    if (this.state.currentPlayer < (this.state.players.length - 1)) {
+      return this.setState({ currentPlayer: this.state.currentPlayer + 1 })
+    }
+
     const playerScore = new CalculateScore(player.hand.cards)
 
     if (dealerScore.isMustHit()) {
@@ -234,7 +241,7 @@ class Game extends React.Component {
     const dealerScore = new CalculateScore(dealerHand.cards)
 
     // Player
-    const currentPlayer = this.state.players[0]
+    const currentPlayer = this.state.players[this.state.currentPlayer]
     // 右側のプレイヤーからアクションを行う為、表示順を反転している
     const displayPlayers = [...this.state.players].reverse()
 
@@ -286,7 +293,7 @@ class Game extends React.Component {
             </button>
             <button
               className="button start-button"
-              disabled={this.state.bet === 0 || this.state.progress !== 'setup'}
+              disabled={currentPlayer.bet === 0 || this.state.progress !== 'setup'}
               onClick={ () => {
                 this.setState(this.setup(this.state.chip, currentPlayer.bet))
               }}
