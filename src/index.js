@@ -181,22 +181,18 @@ class Game extends React.Component {
         <div className="game-board">
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealerScore.value() : '---' }</div>
-            <div className="dealer-hand">
-              <HandCards cards={dealerHand.display()} deck={this.state.deck} />
-            </div>
+            <HandCards role="dealer-hand" cards={dealerHand.display()} deck={this.state.deck} />
           </div>
           <div className="player">
             <Chip chip={this.state.bet} role="player-bet" />
             <Chip chip={this.state.doubleDownBet} role="double-down-bet" />
             <div className="player-score">Player: { playerScore.value() }</div>
-            <div className="player-hand">
-              <HandCards cards={playerHand.display()} deck={this.state.deck} />
-            </div>
+            <HandCards role="player-hand" cards={playerHand.display()} deck={this.state.deck} />
             <div className="player-action">
               <button
                 className="bet-button"
                 disabled={this.state.progress !== 'setup'}
-                onClick={ () => { this.setState({ chip: this.state.chip - 5, bet: this.state.bet + 5 }) }}
+                onClick={ () => { this.setState({ chip: this.state.chip - 50, bet: this.state.bet + 50 }) }}
               >
                 Bet
               </button>

@@ -1,0 +1,9 @@
+.hand-cards{
+  font-size: 120px;
+}
+.dealer-hand {
+  height: 180px;
+}
+.player-hand {
+  height: 300px;
+}
