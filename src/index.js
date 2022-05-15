@@ -110,21 +110,31 @@ class Game extends React.Component {
     })
 
     if(newScore.isBurst()) {
-      if (this.state.currentPlayerNumber < (this.state.players.length - 1)) {
-        return this.setState({ currentPlayer: this.state.currentPlayer + 1 })
+      const newPlayers = this.state.players.map((player) => {
+        if (player !== currentPlayer) {
+          return player
+        }
+        return { hand: newHand, bet: 0, doubleDownBet: 0, reward: 0 }
+      })
+
+      if (this.state.currentPlayer < (this.state.players.length - 1)) {
+        return this.setState({
+          currentPlayer: this.state.currentPlayer + 1, players: newPlayers
+        })
       }
 
       const dealerHand = this.state.dealerHand.cardFaceUp()
-      this.setState({
-        dealerHand: dealerHand,
-        progress: 'finish',
-        players: this.state.players.map((player) => {
-          if (player !== currentPlayer) {
-            return player
-          }
-          return { hand: newHand, bet: 0, doubleDownBet: 0, reward: 0 }
+
+      if (newPlayers.every((player) => { return (player.bet === 0) })) {
+        return this.setState({
+          dealerHand: dealerHand,
+          progress: 'finish',
+          players: newPlayers
         })
-      })
+      }
+
+      const dealerScore = new CalculateScore(dealerHand.cards)
+      this.stayAction(dealerHand, dealerScore, newPlayers)
     }
   }
 
