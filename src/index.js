@@ -28,14 +28,16 @@ class Game extends React.Component {
     if (bet === 0) {
       return {
         deck: deck,
-        playerHand: new Hand([]),
         dealerHand: new Hand([]),
-        result: '',
         chip: chip,
-        bet: bet,
         reward: 0,
-        doubleDownBet: 0,
-        progress: 'setup'
+        progress: 'setup',
+        result: '',
+        players: [{
+          hand: new Hand([]),
+          bet: 0,
+          doubleDownBet: 0,
+        }]
       }
     }
 
@@ -59,28 +61,32 @@ class Game extends React.Component {
 
       return {
         deck: deck,
-        playerHand: playerHand,
         dealerHand: dealerHand,
-        result: result.resultMessage(),
         chip: chip,
-        bet: returnBet,
         reward: reward,
-        doubleDownBet: 0,
-        progress: 'finish'
+        progress: 'finish',
+        result: result.resultMessage(),
+        players: [{
+          hand: playerHand,
+          bet: returnBet,
+          doubleDownBet: 0,
+        }]
       }
     }
 
     // 4. game start
     return {
       deck: deck,
-      playerHand: playerHand,
       dealerHand: dealerHand.cardFaceDown(),
-      result: '',
       chip: chip,
-      bet: bet,
       reward: 0,
-      doubleDownBet: 0,
-      progress: 'start'
+      progress: 'start',
+      result: '',
+      players: [{
+        hand: playerHand,
+        bet: bet,
+        doubleDownBet: 0,
+      }]
     }
   }
 
@@ -89,47 +95,71 @@ class Game extends React.Component {
     this.state = this.setup(1000, 0)
   }
 
-  hitAction() {
+  hitAction(player) {
     const newCard = this.state.deck.drawCard()
-    const newHand = this.state.playerHand.addCard(newCard)
+    const newHand = player.hand.addCard(newCard)
     const newScore = new CalculateScore(newHand.cards)
 
-    this.setState({ playerHand: newHand })
+    this.setState({
+      players: [
+        { hand: newHand, bet: player.bet, doubleDownBet: player.doubleDownBet }
+      ]
+    })
 
     if(newScore.isBurst()) {
       const dealerScore = new CalculateScore(this.state.dealerHand.cards)
       const result = new CompareScore(newScore, dealerScore)
       const dealerHand = this.state.dealerHand.cardFaceUp()
-      this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
+      this.setState({
+        dealerHand: dealerHand,
+        progress: 'finish',
+        result: result.resultMessage(),
+        players: [
+          { hand: newHand, bet: 0, doubleDownBet: 0 }
+        ]
+      })
     }
   }
 
-  async doubleAction(dealerScore) {
-    const bet = this.state.bet
+  async doubleAction(dealerScore, player) {
+    const bet = player.bet
     const chip = this.state.chip - bet
 
-    this.setState({ chip: chip, doubleDownBet: bet })
+    const newCard = this.state.deck.drawCard()
+    const newHand = player.hand.addCard(newCard)
+    const playerScore = new CalculateScore(newHand.cards)
+
+    const newPlayer = { hand: newHand, bet: player.bet, doubleDownBet: bet }
+
+    this.setState({
+      chip: chip,
+      players: [newPlayer]
+    })
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
 
-    const newCard = this.state.deck.drawCard()
-    const newHand = this.state.playerHand.addCard(newCard)
-    const playerScore = new CalculateScore(newHand.cards)
-
-    this.setState({ playerHand: newHand })
-
     const dealerHand = this.state.dealerHand.cardFaceUp()
+
 
     if(playerScore.isBurst()) {
       const result = new CompareScore(playerScore, dealerScore)
-      return this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
+      return this.setState({
+        dealerHand: dealerHand,
+        progress: 'finish',
+        result: result.resultMessage(),
+        players: [
+          { hand: newHand, bet: 0, doubleDownBet: 0 }
+        ]
+      })
     }
 
-    this.stayAction(dealerHand, dealerScore, playerScore, bet * 2)
+    this.stayAction(dealerHand, dealerScore, newPlayer)
   }
 
-  stayAction(dealerHand, dealerScore, playerScore, bet) {
+  stayAction(dealerHand, dealerScore, player) {
+    const playerScore = new CalculateScore(player.hand.cards)
+
     if (dealerScore.isMustHit()) {
       const newCard = this.state.deck.drawCard()
       const newHand = dealerHand.addCard(newCard)
@@ -140,26 +170,43 @@ class Game extends React.Component {
 
       if (newScore.isBurst()) {
         const result = new CompareScore(playerScore, newScore)
-        return this.setState({ result: result.resultMessage(), reward: bet, progress: 'finish' })
+        return this.setState({
+          progress: 'finish',
+          reward: player.bet + player.doubleDownBet,
+          result: result.resultMessage(),
+        })
       }
 
-      return this.stayAction(newHand, newScore, playerScore, bet)
+      return this.stayAction(newHand, newScore, player)
     }
 
     const result = new CompareScore(playerScore, dealerScore)
 
     if (result.isDealerVictory()) {
       return this.setState({
-        result: result.resultMessage(), bet: 0, doubleDownBet: 0, dealerHand: dealerHand.cardFaceUp(), progress: 'finish'
-      })
-    }
-    if (result.isPlayerVictory()) {
-      return this.setState({
-        result: result.resultMessage(), reward: bet, dealerHand: dealerHand.cardFaceUp(), progress: 'finish'
+        dealerHand: dealerHand.cardFaceUp(),
+        progress: 'finish',
+        result: result.resultMessage(),
+        players: [
+          { hand: player.hand, bet: 0, doubleDownBet: 0 }
+        ]
       })
     }
 
-    this.setState({ result: result.resultMessage(), dealerHand: dealerHand.cardFaceUp(), progress: 'finish' })
+    if (result.isPlayerVictory()) {
+      return this.setState({
+        dealerHand: dealerHand.cardFaceUp(),
+        progress: 'finish',
+        reward: player.bet + player.doubleDownBet,
+        result: result.resultMessage(),
+      })
+    }
+
+    this.setState({
+      dealerHand: dealerHand.cardFaceUp(),
+      progress: 'finish',
+      result: result.resultMessage()
+    })
   }
 
   render() {
@@ -168,8 +215,7 @@ class Game extends React.Component {
     const dealerScore = new CalculateScore(dealerHand.cards)
 
     // Player
-    const playerHand = this.state.playerHand
-    const playerScore = new CalculateScore(playerHand.cards)
+    const currentPlayer = this.state.players[0]
 
     return (
       <div className="game">
@@ -183,20 +229,36 @@ class Game extends React.Component {
             <HandCards role="dealer-hand" cards={dealerHand.display()} deck={this.state.deck} />
           </div>
           <div className="player">
-            <div className="player-field">
-              <div className="player-score">Player: { playerScore.value() }</div>
-              <HandCards role="player-hand" cards={playerHand.display()} deck={this.state.deck} />
-              <div className="player-chips">
-                <Chip chip={this.state.reward} role="reward-chip" />
-                <Chip chip={this.state.bet} role="player-bet" />
-                <Chip chip={this.state.doubleDownBet} role="double-down-bet" />
-              </div>
-            </div>
+            {
+              this.state.players.map((player, index) => {
+                const playerHand = player.hand
+                const playerScore = new CalculateScore(playerHand.cards)
+
+                return (
+                  <div className="player-field" key={index}>
+                    <div className="player-score">Player: { playerScore.value() }</div>
+                    <HandCards role="player-hand" cards={playerHand.display()} deck={this.state.deck} />
+                    <div className="player-chips">
+                      <Chip chip={this.state.reward} role="reward-chip" />
+                      <Chip chip={player.bet} role="player-bet" />
+                      <Chip chip={player.doubleDownBet} role="double-down-bet" />
+                    </div>
+                  </div>
+                )
+              })
+            }
             <div className="player-action">
               <button
                 className="button bet-button"
                 disabled={this.state.progress !== 'setup'}
-                onClick={ () => { this.setState({ chip: this.state.chip - 50, bet: this.state.bet + 50 }) }}
+                onClick={ () => {
+                  this.setState({
+                    chip: this.state.chip - 50,
+                    players: [
+                      { hand: currentPlayer.hand, result: '', bet: currentPlayer.bet + 50, doubleDownBet: 0 }
+                    ]
+                  })
+                }}
               >
                 Bet
               </button>
@@ -204,7 +266,7 @@ class Game extends React.Component {
                 className="button start-button"
                 disabled={this.state.bet === 0 || this.state.progress !== 'setup'}
                 onClick={ () => {
-                  this.setState(this.setup(this.state.chip, this.state.bet))
+                  this.setState(this.setup(this.state.chip, currentPlayer.bet))
                 }}
               >
                 Start
@@ -212,20 +274,20 @@ class Game extends React.Component {
               <button
                 className="button hit-button"
                 disabled={this.state.progress !== 'start'}
-                onClick={ () => this.hitAction() }
+                onClick={ () => this.hitAction(currentPlayer) }
               >
                 Hit
               </button>
               <button
                 className="button double-button"
                 disabled={this.state.progress !== 'start'}
-                onClick={ () => this.doubleAction(dealerScore) }
+                onClick={ () => this.doubleAction(dealerScore, currentPlayer) }
               >
                 Double
               </button>
               <button
                 className="button split-button"
-                disabled={!playerHand.isSplitEnable()}
+                disabled={!currentPlayer.hand.isSplitEnable()}
                 onClick={ () => null }
               >
                 Split
@@ -233,14 +295,16 @@ class Game extends React.Component {
               <button
                 className="button stay-button"
                 disabled={this.state.progress !== 'start'}
-                onClick={() => {this.stayAction(dealerHand, dealerScore, playerScore, this.state.bet)}}
+                onClick={() => {this.stayAction(dealerHand, dealerScore, currentPlayer)}}
               >
                 Stay
               </button>
               <button
                 className="button restart-button"
                 disabled={this.state.progress !== 'finish'}
-                onClick={() => { this.setState(this.setup(this.state.chip + this.state.bet + this.state.doubleDownBet + this.state.reward, 0)) }}
+                onClick={() => {
+                  this.setState(this.setup(this.state.chip + currentPlayer.bet + currentPlayer.doubleDownBet + this.state.reward, 0))
+                }}
               >
                 Restart
               </button>
