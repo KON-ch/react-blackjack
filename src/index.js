@@ -138,15 +138,18 @@ class Game extends React.Component {
     }
   }
 
-  splitAction(player) {
-    const newPlayers = player.hand.cards.map((card) => {
-      return {
-        hand: new Hand([card]), bet: player.bet, doubleDownBet: player.doubleDownBet, reward: 0
-      }
-    })
+  splitAction(currentPlayer) {
+    const  newPlayers = this.state.players.map((player) => {
+      if(player !== currentPlayer) { return player }
+      return player.hand.cards.map((card) => {
+        return {
+          hand: new Hand([card]), bet: currentPlayer.bet, doubleDownBet: currentPlayer.doubleDownBet, reward: 0
+        }
+      })
+    }).flat()
 
     this.setState({
-      chip: this.state.chip - player.bet,
+      chip: this.state.chip - currentPlayer.bet,
       players: newPlayers
     })
   }
