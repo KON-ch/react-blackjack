@@ -13,6 +13,10 @@
 }
 .player-field {
   height: 350px;
+  min-width: 350px;
+}
+.current-field {
+  background-color: #f4fff4;
 }
 .player-score {
   font-size: 32px;
@@ -22,6 +26,7 @@
   justify-content: center;
 }
 .action {
+  margin-top: 32px;
   text-align: center;
 }
 .button {

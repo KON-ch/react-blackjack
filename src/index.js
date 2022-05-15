@@ -264,9 +264,10 @@ class Game extends React.Component {
               displayPlayers.map((player, index) => {
                 const playerHand = player.hand
                 const playerScore = new CalculateScore(playerHand.cards)
+                const currentField = player === currentPlayer ? 'current-field' : ''
 
                 return (
-                  <div className="player-field" key={index}>
+                  <div className={`player-field ${currentField}`} key={index}>
                     <div className="player-score">Player: { playerScore.value() }</div>
                     <HandCards role="player-hand" cards={playerHand.display()} deck={this.state.deck} />
                     <div className="player-chips">
