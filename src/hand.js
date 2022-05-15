@@ -18,6 +18,11 @@ export class Hand {
   cardFaceUp() {
     return this
   }
+
+  isSplitEnable() {
+    if (this.cards.length !== 2) { return false }
+    return (this.cards[0].number === this.cards[1].number)
+  }
 }
 
 class FaceDownHand {
@@ -49,5 +54,9 @@ class FaceDownHand {
 
   cardFaceUp() {
     return new Hand(this.cards)
+  }
+
+  isSplitEnable() {
+    return false
   }
 }
