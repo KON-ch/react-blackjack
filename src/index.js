@@ -37,7 +37,7 @@ class Game extends React.Component {
           doubleDownBet: 0,
           reward: 0,
         }],
-        currentPlayer: 0
+        currentPlayerIndex: 0
       }
     }
 
@@ -70,7 +70,7 @@ class Game extends React.Component {
           doubleDownBet: 0,
           reward: reward,
         }],
-        currentPlayer: 0,
+        currentPlayerIndex: 0,
       }
     }
 
@@ -86,7 +86,7 @@ class Game extends React.Component {
         doubleDownBet: 0,
         reward: 0,
       }],
-      currentPlayer: 0
+      currentPlayerIndex: 0
     }
   }
 
@@ -95,7 +95,7 @@ class Game extends React.Component {
     this.state = this.setup(1000, 0)
   }
 
-  hitAction(currentPlayer) {
+  hitAction(currentPlayer, dealerHand, dealerScore) {
     const newCard = this.state.deck.drawCard()
     const newHand = currentPlayer.hand.addCard(newCard)
     const newScore = new CalculateScore(newHand.cards)
@@ -109,32 +109,25 @@ class Game extends React.Component {
         { hand: newHand, bet: currentPlayer.bet, doubleDownBet: currentPlayer.doubleDownBet, reward: 0 }
     })
 
-    this.setState({
-      players: newPlayers
-    })
+    this.setState({ players: newPlayers })
 
     if(newScore.isBurst()) {
-      if (this.state.currentPlayer < (this.state.players.length - 1)) {
-        return this.setState({
-          currentPlayer: this.state.currentPlayer + 1, players: newPlayers
-        })
+      if (this.state.currentPlayerIndex < (this.state.players.length - 1)) {
+        return this.setState({ currentPlayerIndex: this.state.currentPlayerIndex + 1 })
       }
-
-      const dealerHand = this.state.dealerHand.cardFaceUp()
 
       if (newPlayers.every((player) => { return (player.bet === 0) })) {
         return this.setState({
-          dealerHand: dealerHand,
+          dealerHand: dealerHand.cardFaceUp(),
           progress: 'finish',
-          players: newPlayers
         })
       }
 
-      const dealerScore = new CalculateScore(dealerHand.cards)
       this.stayAction(dealerHand, dealerScore, newPlayers)
     }
   }
 
+  // TODO: エースのスプリットに対応する
   splitAction(currentPlayer) {
     const  newPlayers = this.state.players.map((player) => {
       if(player !== currentPlayer) { return player }
@@ -151,7 +144,7 @@ class Game extends React.Component {
     })
   }
 
-  async doubleAction(dealerScore, currentPlayer) {
+  async doubleAction(currentPlayer, dealerHand, dealerScore) {
     const bet = currentPlayer.bet
     const chip = this.state.chip - bet
 
@@ -171,20 +164,17 @@ class Game extends React.Component {
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
 
-    const dealerHand = this.state.dealerHand.cardFaceUp()
-
     if(playerScore.isBurst()) {
-      if (this.state.currentPlayer < (this.state.players.length - 1)) {
+      if (this.state.currentPlayerIndex < (this.state.players.length - 1)) {
         return this.setState({
-          currentPlayer: this.state.currentPlayer + 1, players: newPlayers
+          currentPlayerIndex: this.state.currentPlayerIndex + 1
         })
       }
 
       if (newPlayers.every((player) => { return (player.bet === 0) })) {
         return this.setState({
-          dealerHand: dealerHand,
+          dealerHand: dealerHand.cardFaceUp(),
           progress: 'finish',
-          players: newPlayers
         })
       }
     }
@@ -193,8 +183,8 @@ class Game extends React.Component {
   }
 
   stayAction(dealerHand, dealerScore, players) {
-    if (this.state.currentPlayer < (this.state.players.length - 1)) {
-      return this.setState({ currentPlayer: this.state.currentPlayer + 1 })
+    if (this.state.currentPlayerIndex < (players.length - 1)) {
+      return this.setState({ currentPlayerIndex: this.state.currentPlayerIndex + 1 })
     }
 
     if (dealerScore.isMustHit()) {
@@ -247,7 +237,7 @@ class Game extends React.Component {
     const dealerScore = new CalculateScore(dealerHand.cards)
 
     // Player
-    const currentPlayer = this.state.players[this.state.currentPlayer]
+    const currentPlayer = this.state.players[this.state.currentPlayerIndex]
     // 右側のプレイヤーからアクションを行う為、表示順を反転している
     const displayPlayers = [...this.state.players].reverse()
 
@@ -307,14 +297,14 @@ class Game extends React.Component {
             <button
               className="button hit-button"
               disabled={this.state.progress !== 'start'}
-              onClick={ () => this.hitAction(currentPlayer) }
+              onClick={ () => this.hitAction(currentPlayer, dealerHand, dealerScore) }
             >
               Hit
             </button>
             <button
               className="button double-button"
               disabled={this.state.progress !== 'start'}
-              onClick={ () => this.doubleAction(dealerScore, currentPlayer) }
+              onClick={ () => this.doubleAction(currentPlayer, dealerHand, dealerScore) }
             >
               Double
             </button>
@@ -338,8 +328,8 @@ class Game extends React.Component {
               onClick={() => {
                 const playersChip = this.state.players.reduce((sum, player) => {
                   return (sum + player.bet + player.doubleDownBet + player.reward)
-                }, 0)
-                this.setState(this.setup(this.state.chip + playersChip, 0))
+                }, this.state.chip)
+                this.setState(this.setup(playersChip, 0))
               }}
             >
               Restart
