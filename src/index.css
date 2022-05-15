@@ -13,6 +13,8 @@
 .player {
   text-align: center;
   margin-top: 16px;
+  display: flex;
+  justify-content: space-around;
 }
 .player-field {
   height: 350px;

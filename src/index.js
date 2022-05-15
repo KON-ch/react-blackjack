@@ -121,6 +121,19 @@ class Game extends React.Component {
     }
   }
 
+  splitAction(player) {
+    const newPlayers = player.hand.cards.map((card) => {
+      return {
+        hand: new Hand([card]), bet: player.bet, doubleDownBet: player.doubleDownBet
+      }
+    })
+
+    this.setState({
+      chip: this.state.chip - player.bet,
+      players: newPlayers
+    })
+  }
+
   async doubleAction(dealerScore, player) {
     const bet = player.bet
     const chip = this.state.chip - bet
@@ -230,7 +243,8 @@ class Game extends React.Component {
           </div>
           <div className="player">
             {
-              this.state.players.map((player, index) => {
+              // 右側のプレイヤーからアクションを行う為、表示順を反転している
+              this.state.players.reverse().map((player, index) => {
                 const playerHand = player.hand
                 const playerScore = new CalculateScore(playerHand.cards)
 
@@ -247,68 +261,68 @@ class Game extends React.Component {
                 )
               })
             }
-            <div className="player-action">
-              <button
-                className="button bet-button"
-                disabled={this.state.progress !== 'setup'}
-                onClick={ () => {
-                  this.setState({
-                    chip: this.state.chip - 50,
-                    players: [
-                      { hand: currentPlayer.hand, result: '', bet: currentPlayer.bet + 50, doubleDownBet: 0 }
-                    ]
-                  })
-                }}
-              >
-                Bet
-              </button>
-              <button
-                className="button start-button"
-                disabled={this.state.bet === 0 || this.state.progress !== 'setup'}
-                onClick={ () => {
-                  this.setState(this.setup(this.state.chip, currentPlayer.bet))
-                }}
-              >
-                Start
-              </button>
-              <button
-                className="button hit-button"
-                disabled={this.state.progress !== 'start'}
-                onClick={ () => this.hitAction(currentPlayer) }
-              >
-                Hit
-              </button>
-              <button
-                className="button double-button"
-                disabled={this.state.progress !== 'start'}
-                onClick={ () => this.doubleAction(dealerScore, currentPlayer) }
-              >
-                Double
-              </button>
-              <button
-                className="button split-button"
-                disabled={!currentPlayer.hand.isSplitEnable()}
-                onClick={ () => null }
-              >
-                Split
-              </button>
-              <button
-                className="button stay-button"
-                disabled={this.state.progress !== 'start'}
-                onClick={() => {this.stayAction(dealerHand, dealerScore, currentPlayer)}}
-              >
-                Stay
-              </button>
-              <button
-                className="button restart-button"
-                disabled={this.state.progress !== 'finish'}
-                onClick={() => {
-                  this.setState(this.setup(this.state.chip + currentPlayer.bet + currentPlayer.doubleDownBet + this.state.reward, 0))
-                }}
-              >
-                Restart
-              </button>
-            </div>
+          </div>
+          <div className="action">
+            <button
+              className="button bet-button"
+              disabled={this.state.progress !== 'setup'}
+              onClick={ () => {
+                this.setState({
+                  chip: this.state.chip - 50,
+                  players: [
+                    { hand: currentPlayer.hand, result: '', bet: currentPlayer.bet + 50, doubleDownBet: 0 }
+                  ]
+                })
+              }}
+            >
+              Bet
+            </button>
+            <button
+              className="button start-button"
+              disabled={this.state.bet === 0 || this.state.progress !== 'setup'}
+              onClick={ () => {
+                this.setState(this.setup(this.state.chip, currentPlayer.bet))
+              }}
+            >
+              Start
+            </button>
+            <button
+              className="button hit-button"
+              disabled={this.state.progress !== 'start'}
+              onClick={ () => this.hitAction(currentPlayer) }
+            >
+              Hit
+            </button>
+            <button
+              className="button double-button"
+              disabled={this.state.progress !== 'start'}
+              onClick={ () => this.doubleAction(dealerScore, currentPlayer) }
+            >
+              Double
+            </button>
+            <button
+              className="button split-button"
+              disabled={(this.state.progress === 'finish' || !currentPlayer.hand.isSplitEnable())}
+              onClick={ () => {this.splitAction(currentPlayer)} }
+            >
+              Split
+            </button>
+            <button
+              className="button stay-button"
+              disabled={this.state.progress !== 'start'}
+              onClick={() => {this.stayAction(dealerHand, dealerScore, currentPlayer)}}
+            >
+              Stay
+            </button>
+            <button
+              className="button restart-button"
+              disabled={this.state.progress !== 'finish'}
+              onClick={() => {
+                this.setState(this.setup(this.state.chip + currentPlayer.bet + currentPlayer.doubleDownBet + this.state.reward, 0))
+              }}
+            >
+              Restart
+            </button>
           </div>
         </div>
       </div>
