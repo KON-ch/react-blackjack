@@ -8,24 +8,12 @@
   background-image: url('../public/chip.png');
   background-repeat: no-repeat;
   background-size: contain;
-  position: fixed;
   text-align: center;
   height: 100px;
   width: 100px;
 }
 .game-chip {
+  position: fixed;
   top: 50px;
   left: 85%;
-}
-.reward-chip{
-  top: 350px;
-  left: 10%;
-}
-.player-bet {
-  top: 450px;
-  left: 10%;
-}
-.double-down-bet {
-  top: 450px;
-  left: 20%;
 }

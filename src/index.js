@@ -174,7 +174,6 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-result">
-          <Chip chip={this.state.reward} role="reward-chip" />
           { this.state.result }
         </div>
         <Chip chip={this.state.chip} role="game-chip" />
@@ -184,10 +183,15 @@ class Game extends React.Component {
             <HandCards role="dealer-hand" cards={dealerHand.display()} deck={this.state.deck} />
           </div>
           <div className="player">
-            <Chip chip={this.state.bet} role="player-bet" />
-            <Chip chip={this.state.doubleDownBet} role="double-down-bet" />
-            <div className="player-score">Player: { playerScore.value() }</div>
-            <HandCards role="player-hand" cards={playerHand.display()} deck={this.state.deck} />
+            <div className="player-field">
+              <div className="player-score">Player: { playerScore.value() }</div>
+              <HandCards role="player-hand" cards={playerHand.display()} deck={this.state.deck} />
+              <div className="player-chips">
+                <Chip chip={this.state.reward} role="reward-chip" />
+                <Chip chip={this.state.bet} role="player-bet" />
+                <Chip chip={this.state.doubleDownBet} role="double-down-bet" />
+              </div>
+            </div>
             <div className="player-action">
               <button
                 className="bet-button"
