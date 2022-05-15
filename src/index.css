@@ -21,6 +21,9 @@
   display: flex;
   justify-content: center;
 }
+.action {
+  text-align: center;
+}
 .button {
   margin: 0 12px;
   font-size: 24px;

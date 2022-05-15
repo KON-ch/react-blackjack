@@ -105,11 +105,15 @@ class Game extends React.Component {
         if (player !== currentPlayer) {
           return player
         }
-        return { hand: newHand, bet: currentPlayer.bet, doubleDownBet: currentPlayer.doubleDownBet }
+        return { hand: newHand, bet: currentPlayer.bet, doubleDownBet: currentPlayer.doubleDownBet, reward: 0 }
       })
     })
 
     if(newScore.isBurst()) {
+      if (this.state.currentPlayerNumber < (this.state.players.length - 1)) {
+        return this.setState({ currentPlayer: this.state.currentPlayer + 1 })
+      }
+
       const dealerHand = this.state.dealerHand.cardFaceUp()
       this.setState({
         dealerHand: dealerHand,
@@ -118,7 +122,7 @@ class Game extends React.Component {
           if (player !== currentPlayer) {
             return player
           }
-          return { hand: newHand, bet: 0, doubleDownBet: 0 }
+          return { hand: newHand, bet: 0, doubleDownBet: 0, reward: 0 }
         })
       })
     }
@@ -127,7 +131,7 @@ class Game extends React.Component {
   splitAction(player) {
     const newPlayers = player.hand.cards.map((card) => {
       return {
-        hand: new Hand([card]), bet: player.bet, doubleDownBet: player.doubleDownBet
+        hand: new Hand([card]), bet: player.bet, doubleDownBet: player.doubleDownBet, reward: 0
       }
     })
 
@@ -145,14 +149,14 @@ class Game extends React.Component {
     const newHand = currentPlayer.hand.addCard(newCard)
     const playerScore = new CalculateScore(newHand.cards)
 
-    const newPlayer = { hand: newHand, bet: bet, doubleDownBet: bet }
+    const newPlayers = this.state.players.map((player) => {
+      if (player !== currentPlayer) { return player }
+      return { hand: newHand, bet: bet, doubleDownBet: bet, reward: 0 }
+    })
 
     this.setState({
       chip: chip,
-      players: this.state.players.map((player) => {
-        if (player !== currentPlayer) { return player }
-        return newPlayer
-      })
+      players: newPlayers
     })
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -167,20 +171,18 @@ class Game extends React.Component {
         progress: 'finish',
         players: this.state.players.map((player) => {
           if (player !== currentPlayer) { return player }
-          return { hand: newHand, bet: 0, doubleDownBet: 0 }
+          return { hand: newHand, bet: 0, doubleDownBet: 0, reward: 0 }
         })
       })
     }
 
-    this.stayAction(dealerHand, dealerScore, newPlayer)
+    this.stayAction(dealerHand, dealerScore, newPlayers)
   }
 
-  stayAction(dealerHand, dealerScore, player) {
+  stayAction(dealerHand, dealerScore, players) {
     if (this.state.currentPlayer < (this.state.players.length - 1)) {
       return this.setState({ currentPlayer: this.state.currentPlayer + 1 })
     }
-
-    const playerScore = new CalculateScore(player.hand.cards)
 
     if (dealerScore.isMustHit()) {
       const newCard = this.state.deck.drawCard()
@@ -193,36 +195,36 @@ class Game extends React.Component {
       if (newScore.isBurst()) {
         return this.setState({
           progress: 'finish',
-          reward: player.bet + player.doubleDownBet,
+          players: players.map((player) => {
+            const reward = player.bet + player.doubleDownBet
+            return { hand: player.hand, bet: player.bet, doubleDownBet: player.doubleDownBet, reward: reward }
+          })
         })
       }
 
-      return this.stayAction(newHand, newScore, player)
+      return this.stayAction(newHand, newScore, players)
     }
 
-    const result = new CompareScore(playerScore, dealerScore)
+    const evaluatedPlayers = players.map((player) => {
+      const playerScore = new CalculateScore(player.hand.cards)
+      const result = new CompareScore(playerScore, dealerScore)
 
-    if (result.isDealerVictory()) {
-      return this.setState({
-        dealerHand: dealerHand.cardFaceUp(),
-        progress: 'finish',
-        players: [
-          { hand: player.hand, bet: 0, doubleDownBet: 0 }
-        ]
-      })
-    }
+      if (result.isDealerVictory()) {
+        return { hand: player.hand, bet: 0, doubleDownBet: 0, reward: 0 }
+      }
 
-    if (result.isPlayerVictory()) {
-      return this.setState({
-        dealerHand: dealerHand.cardFaceUp(),
-        progress: 'finish',
-        reward: player.bet + player.doubleDownBet,
-      })
-    }
+      if (result.isPlayerVictory()) {
+        const reward = player.bet + player.doubleDownBet
+        return { hand: player.hand, bet: player.bet, doubleDownBet: player.doubleDownBet, reward: reward }
+      }
+
+      return { hand: player.hand, bet: player.bet, doubleDownBet: player.doubleDownBet, reward: 0 }
+    })
 
     this.setState({
       dealerHand: dealerHand.cardFaceUp(),
       progress: 'finish',
+      players: evaluatedPlayers
     })
   }
 
@@ -272,7 +274,7 @@ class Game extends React.Component {
                 this.setState({
                   chip: this.state.chip - 50,
                   players: [
-                    { hand: currentPlayer.hand, bet: currentPlayer.bet + 50, doubleDownBet: 0 }
+                    { hand: currentPlayer.hand, bet: currentPlayer.bet + 50, doubleDownBet: 0, reward: 0 }
                   ]
                 })
               }}
@@ -312,7 +314,7 @@ class Game extends React.Component {
             <button
               className="button stay-button"
               disabled={this.state.progress !== 'start'}
-              onClick={() => {this.stayAction(dealerHand, dealerScore, currentPlayer)}}
+              onClick={() => {this.stayAction(dealerHand, dealerScore, this.state.players)}}
             >
               Stay
             </button>
@@ -321,8 +323,8 @@ class Game extends React.Component {
               disabled={this.state.progress !== 'finish'}
               onClick={() => {
                 const playersChip = this.state.players.reduce((sum, player) => {
-                  return sum + player.bet + player.doubleDownBet + player.reward
-                })
+                  return (sum + player.bet + player.doubleDownBet + player.reward)
+                }, 0)
                 this.setState(this.setup(this.state.chip + playersChip, 0))
               }}
             >
