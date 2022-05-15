@@ -30,12 +30,12 @@ class Game extends React.Component {
         deck: deck,
         dealerHand: new Hand([]),
         chip: chip,
-        reward: 0,
         progress: 'setup',
         players: [{
           hand: new Hand([]),
           bet: 0,
           doubleDownBet: 0,
+          reward: 0,
         }],
         currentPlayer: 0
       }
@@ -63,12 +63,12 @@ class Game extends React.Component {
         deck: deck,
         dealerHand: dealerHand,
         chip: chip,
-        reward: reward,
         progress: 'finish',
         players: [{
           hand: playerHand,
           bet: returnBet,
           doubleDownBet: 0,
+          reward: reward,
         }],
         currentPlayer: 0,
       }
@@ -79,12 +79,12 @@ class Game extends React.Component {
       deck: deck,
       dealerHand: dealerHand.cardFaceDown(),
       chip: chip,
-      reward: 0,
       progress: 'start',
       players: [{
         hand: playerHand,
         bet: bet,
         doubleDownBet: 0,
+        reward: 0,
       }],
       currentPlayer: 0
     }
@@ -255,7 +255,7 @@ class Game extends React.Component {
                     <div className="player-score">Player: { playerScore.value() }</div>
                     <HandCards role="player-hand" cards={playerHand.display()} deck={this.state.deck} />
                     <div className="player-chips">
-                      <Chip chip={this.state.reward} role="reward-chip" />
+                      <Chip chip={player.reward} role="reward-chip" />
                       <Chip chip={player.bet} role="player-bet" />
                       <Chip chip={player.doubleDownBet} role="double-down-bet" />
                     </div>
@@ -320,7 +320,10 @@ class Game extends React.Component {
               className="button restart-button"
               disabled={this.state.progress !== 'finish'}
               onClick={() => {
-                this.setState(this.setup(this.state.chip + currentPlayer.bet + currentPlayer.doubleDownBet + this.state.reward, 0))
+                const playersChip = this.state.players.reduce((sum, player) => {
+                  return sum + player.bet + player.doubleDownBet + player.reward
+                })
+                this.setState(this.setup(this.state.chip + playersChip, 0))
               }}
             >
               Restart
