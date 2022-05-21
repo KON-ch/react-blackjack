@@ -123,11 +123,10 @@ class Game extends React.Component {
         })
       }
 
-      this.stayAction(dealerHand, dealerScore, newPlayers)
+      this.stayAction(dealerHand, dealerScore, newPlayers, this.state.currentPlayerIndex)
     }
   }
 
-  // TODO: エースのスプリットに対応する
   splitAction(currentPlayer) {
     const  newPlayers = this.state.players.map((player) => {
       if(player !== currentPlayer) { return player }
@@ -142,6 +141,21 @@ class Game extends React.Component {
       chip: this.state.chip - currentPlayer.bet,
       players: newPlayers
     })
+
+    if (!currentPlayer.hand.isTwoAce()) { return }
+
+    const finishPlayers = newPlayers.map((player) => {
+      const newCard = this.state.deck.drawCard()
+      const newHand = player.hand.addCard(newCard)
+      return { hand: newHand, bet: player.bet, doubleDownBet: player.doubleDownBet, reward: 0 }
+    })
+
+    const dealerHand = this.state.dealerHand
+    const dealerScore = new CalculateScore(dealerHand.cards)
+
+    console.log(finishPlayers)
+
+    this.stayAction(dealerHand, dealerScore, finishPlayers, finishPlayers.length)
   }
 
   async doubleAction(currentPlayer, dealerHand, dealerScore) {
@@ -179,12 +193,12 @@ class Game extends React.Component {
       }
     }
 
-    this.stayAction(dealerHand, dealerScore, newPlayers)
+    this.stayAction(dealerHand, dealerScore, newPlayers, this.state.currentPlayerIndex)
   }
 
-  stayAction(dealerHand, dealerScore, players) {
-    if (this.state.currentPlayerIndex < (players.length - 1)) {
-      return this.setState({ currentPlayerIndex: this.state.currentPlayerIndex + 1 })
+  stayAction(dealerHand, dealerScore, players, currentPlayerIndex) {
+    if (currentPlayerIndex < (players.length - 1)) {
+      return this.setState({ currentPlayerIndex: currentPlayerIndex + 1 })
     }
 
     if (dealerScore.isMustHit()) {
@@ -205,7 +219,7 @@ class Game extends React.Component {
         })
       }
 
-      return this.stayAction(newHand, newScore, players)
+      return this.stayAction(newHand, newScore, players, currentPlayerIndex)
     }
 
     const evaluatedPlayers = players.map((player) => {
@@ -318,7 +332,7 @@ class Game extends React.Component {
             <button
               className="button stay-button"
               disabled={this.state.progress !== 'start'}
-              onClick={() => {this.stayAction(dealerHand, dealerScore, this.state.players)}}
+              onClick={() => {this.stayAction(dealerHand, dealerScore, this.state.players, this.state.currentPlayerIndex)}}
             >
               Stay
             </button>

@@ -23,6 +23,10 @@ export class Hand {
     if (this.cards.length !== 2) { return false }
     return (this.cards[0].value === this.cards[1].value)
   }
+
+  isTwoAce() {
+    (this.cards.length === 2 && this.cards.every((card) => { return (card.number === 1) }))
+  }
 }
 
 class FaceDownHand {
@@ -60,7 +64,7 @@ class FaceDownHand {
     return false
   }
 
-  isTowAce() {
+  isTwoAce() {
     return false
   }
 }
