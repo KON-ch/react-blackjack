@@ -21,7 +21,7 @@ export class Hand {
 
   isSplitEnable() {
     if (this.cards.length !== 2) { return false }
-    return (this.cards[0].number === this.cards[1].number)
+    return (this.cards[0].value === this.cards[1].value)
   }
 }
 
@@ -57,6 +57,10 @@ class FaceDownHand {
   }
 
   isSplitEnable() {
+    return false
+  }
+
+  isTowAce() {
     return false
   }
 }
