@@ -36,7 +36,7 @@ export class Hand {
 class FaceDownHand {
   constructor(cards) {
     this.cards = cards
-    this.faceDownCard = { number: 0, value: 0, displayCode: 127136, suit: '' }
+    this.faceDownCard = { number: 0, value: 0, displayCode: 127136, suit: 'none' }
   }
 
   display() {

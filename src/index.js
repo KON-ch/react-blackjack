@@ -226,10 +226,9 @@ class Game extends React.Component {
         <div className="game-board">
           <div className="dealer">
             <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealer.score.value() : '---' }</div>
-            <HandCards role="dealer-hand" cards={dealer.displayHand()} deck={this.state.deck} />
+            <HandCards role="dealer-hand" cards={dealer.displayHand()} />
           </div>
           <PlayerField
-            deck={this.state.deck}
             players={displayPlayers}
             currentPlayer={currentPlayer}
           />

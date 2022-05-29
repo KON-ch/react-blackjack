@@ -1,0 +1,9 @@
+.spade,.club {
+  color: black;
+}
+.heart,.diamond {
+  color: #d30000;
+}
+.none {
+  color: green;
+}

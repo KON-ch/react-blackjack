@@ -8,7 +8,6 @@ export class HandCards extends React.Component {
       return (
         <Card
           card={card}
-          color={this.props.deck.suitColor(card)}
           key={card.displayCode}
         />
       )
