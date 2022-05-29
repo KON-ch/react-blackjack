@@ -1,7 +1,7 @@
-import { CalculateScore } from "./calculate_score"
-import { Hand } from "./hand"
-import { Bet } from "./bet"
-import { Reward } from "./reward"
+import { CalculateScore } from "../common/CalculateScore"
+import { Hand } from "../common/Hand"
+import { Bet } from "./Bet"
+import { Reward } from "./Reward"
 
 export class Player {
   constructor(hand = new Hand([]), bet = new Bet(0), reward = new Reward(0)) {

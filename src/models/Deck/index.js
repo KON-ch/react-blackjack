@@ -1,6 +1,9 @@
+import defaultDeck from './deck.json'
+
 export class Deck {
-  constructor(cards) {
-    this.cards = cards
+  constructor() {
+    // 52枚のカードで毎回開始できるようにディープコピーしている
+    this.cards = JSON.parse(JSON.stringify((defaultDeck))).cards
   }
 
   drawCard() {

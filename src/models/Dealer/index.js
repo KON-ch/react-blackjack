@@ -1,5 +1,5 @@
-import { CalculateScore } from "./calculate_score"
-import { Hand } from "./hand"
+import { CalculateScore } from "../common/CalculateScore"
+import { Hand } from "../common/Hand"
 
 export class Dealer {
   constructor(hand = new Hand([])) {

@@ -2,30 +2,25 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import './index.css';
 
-import { Deck } from "./deck"
-import { CompareScore } from "./compare_score";
-import { Dealer } from "./dealer";
-import { Player } from "./player";
-import { Progress } from "./progress";
+// Models
+import { Deck } from "./models/Deck"
+import { Dealer } from "./models/Dealer";
+import { Player } from "./models/Player";
+import { CompareScore } from "./models/CompareScore";
+import { Progress } from "./models/Progress";
 
-// Component
+// Components
 import { ActionButtons } from "./components/ActionButtons";
 import { Chip } from "./components/Chip";
 import { HandCards } from "./components/HandCards";
 import { PlayerField } from "./components/PlayerField";
-
-// JSON
-import defaultDeck from './deck.json'
 
 const container = document.getElementById('root');
 const root = createRoot(container)
 
 class Game extends React.Component {
   setup(chip, player) {
-    // 52枚のカードで毎回開始できるようにディープコピーしている
-    const defaultCards = JSON.parse(JSON.stringify((defaultDeck))).cards
-
-    const deck = new Deck(defaultCards)
+    const deck = new Deck()
 
     const progress = new Progress()
 
