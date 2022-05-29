@@ -11,37 +11,37 @@ export class ActionButtons extends React.Component {
       <div className="action">
         <Button
           text="Bet"
-          disabled={progress !== 'setup'}
+          disabled={!progress.isSetup()}
           action={this.props.betAction}
         />
         <Button
           text="Start"
-          disabled={!currentPlayer.hasBet() || progress !== 'setup'}
+          disabled={!currentPlayer.hasBet() || !progress.isSetup()}
           action={this.props.startAction}
         />
         <Button
           text="Hit"
-          disabled={progress !== 'start'}
+          disabled={progress.isSetup() || progress.isFinish()}
           action={this.props.hitAction}
         />
         <Button
           text="Double"
-          disabled={progress !== 'start'}
+          disabled={progress.isSetup() || progress.isFinish()}
           action={this.props.doubleAction}
         />
         <Button
           text="Split"
-          disabled={(progress === 'finish' || !currentPlayer.isSplitEnable())}
+          disabled={(progress.isFinish() || !currentPlayer.isSplitEnable())}
           action={this.props.splitAction}
         />
         <Button
           text="Stay"
-          disabled={progress !== 'start'}
+          disabled={progress.isSetup() || progress.isFinish()}
           action={this.props.stayAction}
         />
         <Button
           text="Restart"
-          disabled={progress !== 'finish'}
+          disabled={!progress.isFinish()}
           action={this.props.restartAction}
         />
       </div>

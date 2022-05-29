@@ -6,6 +6,7 @@ import { Deck } from "./deck"
 import { CompareScore } from "./compare_score";
 import { Dealer } from "./dealer";
 import { Player } from "./player";
+import { Progress } from "./progress";
 
 // Component
 import { ActionButtons } from "./components/ActionButtons";
@@ -26,13 +27,15 @@ class Game extends React.Component {
 
     const deck = new Deck(defaultCards)
 
+    const progress = new Progress()
+
     // 1. no bet
     if (!player.hasBet()) {
       return {
         deck: deck,
         dealer: new Dealer(),
         chip: chip,
-        progress: 'setup',
+        progress: progress,
         players: [player],
         currentPlayerIndex: 0
       }
@@ -58,7 +61,7 @@ class Game extends React.Component {
         deck: deck,
         dealer: dealer.cardFaceUp(),
         chip: chip,
-        progress: 'finish',
+        progress: progress.finish(),
         players: [returnBetPlayer],
         currentPlayerIndex: 0,
       }
@@ -69,7 +72,7 @@ class Game extends React.Component {
       deck: deck,
       dealer: dealer,
       chip: chip,
-      progress: 'start',
+      progress: progress.next(),
       players: [startPlayer],
       currentPlayerIndex: 0
     }
@@ -102,7 +105,7 @@ class Game extends React.Component {
       if (newPlayers.every((player) => { return (!player.hasBet()) })) {
         return this.setState({
           dealer: dealer.cardFaceUp(),
-          progress: 'finish',
+          progress: this.state.progress.finish(),
         })
       }
 
@@ -160,7 +163,7 @@ class Game extends React.Component {
       if (newPlayers.every((player) => { return (!player.hasBet()) })) {
         return this.setState({
           dealer: dealer.cardFaceUp(),
-          progress: 'finish',
+          progress: this.state.progress.finish(),
         })
       }
     }
@@ -181,7 +184,7 @@ class Game extends React.Component {
 
       if (newDealer.isBurst()) {
         return this.setState({
-          progress: 'finish',
+          progress: this.state.progress.finish(),
           players: players.map((player) => {
             return player.addReward()
           })
@@ -207,7 +210,7 @@ class Game extends React.Component {
 
     this.setState({
       dealer: dealer.cardFaceUp(),
-      progress: 'finish',
+      progress: this.state.progress.finish(),
       players: evaluatedPlayers
     })
   }
@@ -226,7 +229,7 @@ class Game extends React.Component {
         <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
-            <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealer.score.value() : '---' }</div>
+            <div className="dealer-score">Dealer: { this.state.progress.isFinish() ?  dealer.score.value() : '---' }</div>
             <HandCards role="dealer-hand" cards={dealer.displayHand()} />
           </div>
           <PlayerField
