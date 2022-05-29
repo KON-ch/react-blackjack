@@ -1,10 +1,5 @@
-.game-result {
-  font-size: 32px;
-  margin: 16px;
-  text-align: center;
-  min-height: 48px;
-}
 .dealer {
+  margin-top: 32px;
   text-align: center;
 }
 .dealer-score {
@@ -13,9 +8,15 @@
 .player {
   text-align: center;
   margin-top: 16px;
+  display: flex;
+  justify-content: space-around;
 }
 .player-field {
   height: 350px;
+  min-width: 350px;
+}
+.current-field {
+  background-color: #f4fff4;
 }
 .player-score {
   font-size: 32px;
@@ -24,7 +25,11 @@
   display: flex;
   justify-content: center;
 }
-.bet-button, .start-button, .hit-button, .double-button, .stay-button, .restart-button {
+.action {
+  margin-top: 32px;
+  text-align: center;
+}
+.button {
   margin: 0 12px;
   font-size: 24px;
   width: 128px;

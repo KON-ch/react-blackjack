@@ -3,9 +3,9 @@ import { createRoot } from "react-dom/client";
 import './index.css';
 
 import { Deck } from "./deck"
-import { Hand } from "./hand"
-import { CalculateScore } from "./calculate_score"
 import { CompareScore } from "./compare_score";
+import { Dealer } from "./dealer";
+import { Player } from "./player";
 
 // Component
 import { HandCards } from "./hand_cards";
@@ -18,24 +18,21 @@ const container = document.getElementById('root');
 const root = createRoot(container)
 
 class Game extends React.Component {
-  setup(chip, bet) {
+  setup(chip, player) {
     // 52枚のカードで毎回開始できるようにディープコピーしている
     const defaultCards = JSON.parse(JSON.stringify((defaultDeck))).cards
 
     const deck = new Deck(defaultCards)
 
     // 1. no bet
-    if (bet === 0) {
+    if (!player.hasBet()) {
       return {
         deck: deck,
-        playerHand: new Hand([]),
-        dealerHand: new Hand([]),
-        result: '',
+        dealer: new Dealer(),
         chip: chip,
-        bet: bet,
-        reward: 0,
-        doubleDownBet: 0,
-        progress: 'setup'
+        progress: 'setup',
+        players: [player],
+        currentPlayerIndex: 0
       }
     }
 
@@ -45,199 +42,269 @@ class Game extends React.Component {
     const playerCard2 = deck.drawCard()
     const dealerCard2 = deck.drawCard()
 
-    const playerHand = new Hand([playerCard1, playerCard2])
-    const dealerHand = new Hand([dealerCard1, dealerCard2])
+    const startPlayer = player.setupCard([playerCard1, playerCard2])
 
-    const playerScore = new CalculateScore(playerHand.cards)
-    const dealerScore = new CalculateScore(dealerHand.cards)
+    const dealer = new Dealer().setupCard([dealerCard1, dealerCard2])
 
     // 3. game finish blackjack
-    if (playerScore.isBlackJack() || dealerScore.isBlackJack()) {
-      const result = new CompareScore(playerScore, dealerScore)
-      const reward = result.isPlayerVictory() ? bet * 1.5 : 0
-      const returnBet = result.isDealerVictory() ? 0 : bet
+    if (startPlayer.isBlackJack() || dealer.isBlackJack()) {
+      const result = new CompareScore(startPlayer.score, dealer.score)
+      const addedRewardPlayer = result.isPlayerVictory() ? startPlayer.addReward(startPlayer.betAmount() * 1.5) : startPlayer
+      const returnBetPlayer = result.isDealerVictory() ? addedRewardPlayer.removeBet() : addedRewardPlayer
 
       return {
         deck: deck,
-        playerHand: playerHand,
-        dealerHand: dealerHand,
-        result: result.resultMessage(),
+        dealer: dealer.cardFaceUp(),
         chip: chip,
-        bet: returnBet,
-        reward: reward,
-        doubleDownBet: 0,
-        progress: 'finish'
+        progress: 'finish',
+        players: [returnBetPlayer],
+        currentPlayerIndex: 0,
       }
     }
 
     // 4. game start
     return {
       deck: deck,
-      playerHand: playerHand,
-      dealerHand: dealerHand.cardFaceDown(),
-      result: '',
+      dealer: dealer,
       chip: chip,
-      bet: bet,
-      reward: 0,
-      doubleDownBet: 0,
-      progress: 'start'
+      progress: 'start',
+      players: [startPlayer],
+      currentPlayerIndex: 0
     }
   }
 
   constructor(props) {
     super(props);
-    this.state = this.setup(1000, 0)
+
+    this.state = this.setup(1000, new Player())
   }
 
-  hitAction() {
+  hitAction(currentPlayer, dealer) {
     const newCard = this.state.deck.drawCard()
-    const newHand = this.state.playerHand.addCard(newCard)
-    const newScore = new CalculateScore(newHand.cards)
+    const newPlayer = currentPlayer.addCard(newCard)
 
-    this.setState({ playerHand: newHand })
+    const newPlayers = this.state.players.map((player) => {
+      if (player !== currentPlayer) {
+        return player
+      }
+      return newPlayer.isBurst() ? newPlayer.removeBet() : newPlayer
+    })
 
-    if(newScore.isBurst()) {
-      const dealerScore = new CalculateScore(this.state.dealerHand.cards)
-      const result = new CompareScore(newScore, dealerScore)
-      const dealerHand = this.state.dealerHand.cardFaceUp()
-      this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
+    this.setState({ players: newPlayers })
+
+    if(newPlayer.isBurst()) {
+      if (this.state.currentPlayerIndex < (this.state.players.length - 1)) {
+        return this.setState({ currentPlayerIndex: this.state.currentPlayerIndex + 1 })
+      }
+
+      if (newPlayers.every((player) => { return (!player.hasBet()) })) {
+        return this.setState({
+          dealer: dealer.cardFaceUp(),
+          progress: 'finish',
+        })
+      }
+
+      this.stayAction(dealer, newPlayers, this.state.currentPlayerIndex)
     }
   }
 
-  async doubleAction(dealerScore) {
-    const bet = this.state.bet
-    const chip = this.state.chip - bet
+  splitAction(currentPlayer) {
+    const  newPlayers = this.state.players.map((player) => {
+      if(player !== currentPlayer) { return player }
 
-    this.setState({ chip: chip, doubleDownBet: bet })
+      return player.splitHand()
+    }).flat()
+
+    this.setState({
+      chip: this.state.chip - currentPlayer.betAmount(),
+      players: newPlayers
+    })
+
+    if (!currentPlayer.isTwoAce()) { return }
+
+    const finishPlayers = newPlayers.map((player) => {
+      const newCard = this.state.deck.drawCard()
+      return player.addCard(newCard)
+    })
+
+    this.stayAction(this.state.dealer, finishPlayers, finishPlayers.length)
+  }
+
+  async doubleAction(currentPlayer, dealer) {
+    const doubleDownPlayer = currentPlayer.doubleDown()
+    const chip = this.state.chip - doubleDownPlayer.betAmount()
+
+    const newCard = this.state.deck.drawCard()
+    const newPlayer = doubleDownPlayer.addCard(newCard)
+
+    const newPlayers = this.state.players.map((player) => {
+      if (player !== currentPlayer) { return player }
+
+      return newPlayer.isBurst() ? newPlayer.removeBet() : newPlayer
+    })
+
+    this.setState({ chip: chip, players: newPlayers })
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
 
-    const newCard = this.state.deck.drawCard()
-    const newHand = this.state.playerHand.addCard(newCard)
-    const playerScore = new CalculateScore(newHand.cards)
-
-    this.setState({ playerHand: newHand })
-
-    const dealerHand = this.state.dealerHand.cardFaceUp()
-
-    if(playerScore.isBurst()) {
-      const result = new CompareScore(playerScore, dealerScore)
-      return this.setState({ result: result.resultMessage(), dealerHand: dealerHand, bet: 0, doubleDownBet: 0, progress: 'finish' })
-    }
-
-    this.stayAction(dealerHand, dealerScore, playerScore, bet * 2)
-  }
-
-  stayAction(dealerHand, dealerScore, playerScore, bet) {
-    if (dealerScore.isMustHit()) {
-      const newCard = this.state.deck.drawCard()
-      const newHand = dealerHand.addCard(newCard)
-
-      this.setState({ dealerHand: newHand })
-
-      const newScore = new CalculateScore(newHand.cards)
-
-      if (newScore.isBurst()) {
-        const result = new CompareScore(playerScore, newScore)
-        return this.setState({ result: result.resultMessage(), reward: bet, progress: 'finish' })
+    if(newPlayer.isBurst()) {
+      if (this.state.currentPlayerIndex < (this.state.players.length - 1)) {
+        return this.setState({
+          currentPlayerIndex: this.state.currentPlayerIndex + 1
+        })
       }
 
-      return this.stayAction(newHand, newScore, playerScore, bet)
+      if (newPlayers.every((player) => { return (!player.hasBet()) })) {
+        return this.setState({
+          dealer: dealer.cardFaceUp(),
+          progress: 'finish',
+        })
+      }
     }
 
-    const result = new CompareScore(playerScore, dealerScore)
+    this.stayAction(dealer, newPlayers, this.state.currentPlayerIndex)
+  }
 
-    if (result.isDealerVictory()) {
-      return this.setState({
-        result: result.resultMessage(), bet: 0, doubleDownBet: 0, dealerHand: dealerHand.cardFaceUp(), progress: 'finish'
-      })
-    }
-    if (result.isPlayerVictory()) {
-      return this.setState({
-        result: result.resultMessage(), reward: bet, dealerHand: dealerHand.cardFaceUp(), progress: 'finish'
-      })
+  stayAction(dealer, players, currentPlayerIndex) {
+    if (currentPlayerIndex < (players.length - 1)) {
+      return this.setState({ currentPlayerIndex: currentPlayerIndex + 1 })
     }
 
-    this.setState({ result: result.resultMessage(), dealerHand: dealerHand.cardFaceUp(), progress: 'finish' })
+    if (dealer.isMustHit()) {
+      const newCard = this.state.deck.drawCard()
+      const newDealer = dealer.addCard(newCard)
+
+      this.setState({ dealer: newDealer })
+
+      if (newDealer.isBurst()) {
+        return this.setState({
+          progress: 'finish',
+          players: players.map((player) => {
+            return player.addReward()
+          })
+        })
+      }
+
+      return this.stayAction(newDealer, players, currentPlayerIndex)
+    }
+
+    const evaluatedPlayers = players.map((player) => {
+      const result = new CompareScore(player.score, dealer.score)
+
+      if (result.isDealerVictory()) {
+        return player.removeBet()
+      }
+
+      if (result.isPlayerVictory()) {
+        return player.addReward()
+      }
+
+      return player
+    })
+
+    this.setState({
+      dealer: dealer.cardFaceUp(),
+      progress: 'finish',
+      players: evaluatedPlayers
+    })
   }
 
   render() {
     // Dealer
-    const dealerHand = this.state.dealerHand
-    const dealerScore = new CalculateScore(dealerHand.cards)
+    const dealer = this.state.dealer
 
     // Player
-    const playerHand = this.state.playerHand
-    const playerScore = new CalculateScore(playerHand.cards)
+    const currentPlayer = this.state.players[this.state.currentPlayerIndex]
+    // 右側のプレイヤーからアクションを行う為、表示順を反転している
+    const displayPlayers = [...this.state.players].reverse()
 
     return (
       <div className="game">
-        <div className="game-result">
-          { this.state.result }
-        </div>
         <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
-            <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealerScore.value() : '---' }</div>
-            <HandCards role="dealer-hand" cards={dealerHand.display()} deck={this.state.deck} />
+            <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealer.score.value() : '---' }</div>
+            <HandCards role="dealer-hand" cards={dealer.displayHand()} deck={this.state.deck} />
           </div>
           <div className="player">
-            <div className="player-field">
-              <div className="player-score">Player: { playerScore.value() }</div>
-              <HandCards role="player-hand" cards={playerHand.display()} deck={this.state.deck} />
-              <div className="player-chips">
-                <Chip chip={this.state.reward} role="reward-chip" />
-                <Chip chip={this.state.bet} role="player-bet" />
-                <Chip chip={this.state.doubleDownBet} role="double-down-bet" />
-              </div>
-            </div>
-            <div className="player-action">
-              <button
-                className="bet-button"
-                disabled={this.state.progress !== 'setup'}
-                onClick={ () => { this.setState({ chip: this.state.chip - 50, bet: this.state.bet + 50 }) }}
-              >
-                Bet
-              </button>
-              <button
-                className="start-button"
-                disabled={this.state.bet === 0 || this.state.progress !== 'setup'}
-                onClick={ () => {
-                  this.setState(this.setup(this.state.chip, this.state.bet))
-                }}
-              >
-                Start
-              </button>
-              <button
-                className="hit-button"
-                disabled={this.state.progress !== 'start'}
-                onClick={ () => this.hitAction() }
-              >
-                Hit
-              </button>
-              <button
-                className="double-button"
-                disabled={this.state.progress !== 'start'}
-                onClick={ () => this.doubleAction(dealerScore) }
-              >
-                Double
-              </button>
-              <button
-                className="stay-button"
-                disabled={this.state.progress !== 'start'}
-                onClick={() => {this.stayAction(dealerHand, dealerScore, playerScore, this.state.bet)}}
-              >
-                Stay
-              </button>
-              <button
-                className="restart-button"
-                disabled={this.state.progress !== 'finish'}
-                onClick={() => { this.setState(this.setup(this.state.chip + this.state.bet + this.state.doubleDownBet + this.state.reward, 0)) }}
-              >
-                Restart
-              </button>
-            </div>
+            {
+              displayPlayers.map((player, index) => {
+                const currentField = player === currentPlayer ? 'current-field' : ''
+
+                return (
+                  <div className={`player-field ${currentField}`} key={index}>
+                    <div className="player-score">Player: { player.score.value() }</div>
+                    <HandCards role="player-hand" cards={player.displayHand()} deck={this.state.deck} />
+                    <div className="player-chips">
+                      <Chip chip={player.rewardAmount()} role="reward-chip" />
+                      <Chip chip={player.betAmount()} role="player-bet" />
+                      <Chip chip={player.doubleDownAmount()} role="double-down-bet" />
+                    </div>
+                  </div>
+                )
+              })
+            }
+          </div>
+          <div className="action">
+            <button
+              className="button bet-button"
+              disabled={this.state.progress !== 'setup'}
+              onClick={ () => {
+                this.setState({ chip: this.state.chip - 50, players: [currentPlayer.addBet(50)] })
+              }}
+            >
+              Bet
+            </button>
+            <button
+              className="button start-button"
+              disabled={!currentPlayer.hasBet() || this.state.progress !== 'setup'}
+              onClick={ () => {
+                this.setState(this.setup(this.state.chip, currentPlayer))
+              }}
+            >
+              Start
+            </button>
+            <button
+              className="button hit-button"
+              disabled={this.state.progress !== 'start'}
+              onClick={ () => this.hitAction(currentPlayer, dealer) }
+            >
+              Hit
+            </button>
+            <button
+              className="button double-button"
+              disabled={this.state.progress !== 'start'}
+              onClick={ () => this.doubleAction(currentPlayer, dealer) }
+            >
+              Double
+            </button>
+            <button
+              className="button split-button"
+              disabled={(this.state.progress === 'finish' || !currentPlayer.isSplitEnable())}
+              onClick={ () => {this.splitAction(currentPlayer)} }
+            >
+              Split
+            </button>
+            <button
+              className="button stay-button"
+              disabled={this.state.progress !== 'start'}
+              onClick={() => {this.stayAction(dealer, this.state.players, this.state.currentPlayerIndex)}}
+            >
+              Stay
+            </button>
+            <button
+              className="button restart-button"
+              disabled={this.state.progress !== 'finish'}
+              onClick={() => {
+                const playersChip = this.state.players.reduce((sum, player) => {
+                  return (sum + player.totalReturnAmount())
+                }, this.state.chip)
+                this.setState(this.setup(playersChip, new Player()))
+              }}
+            >
+              Restart
+            </button>
           </div>
         </div>
       </div>
