@@ -1,5 +1,5 @@
 import React from "react";
-import './chip.css'
+import './index.css'
 
 export class Chip extends React.Component {
   render() {

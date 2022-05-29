@@ -8,8 +8,8 @@ import { Dealer } from "./dealer";
 import { Player } from "./player";
 
 // Component
-import { HandCards } from "./hand_cards";
-import { Chip } from "./chip"
+import { HandCards } from "./components/HandCards";
+import { Chip } from "./components/Chip";
 
 // JSON
 import defaultDeck from './deck.json'
