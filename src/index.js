@@ -8,7 +8,7 @@ import { Dealer } from "./dealer";
 import { Player } from "./player";
 
 // Component
-import { Button } from "./components/Button";
+import { ActionButtons } from "./components/ActionButtons";
 import { Chip } from "./components/Chip";
 import { HandCards } from "./components/HandCards";
 import { PlayerField } from "./components/PlayerField";
@@ -233,52 +233,47 @@ class Game extends React.Component {
             players={displayPlayers}
             currentPlayer={currentPlayer}
           />
-          <div className="action">
-            <Button
-              text="Bet"
-              disabled={this.state.progress !== 'setup'}
-              onClick={ () => {
-                this.setState({ chip: this.state.chip - 50, players: [currentPlayer.addBet(50)] })
-              }}
-            />
-            <Button
-              text="Start"
-              disabled={!currentPlayer.hasBet() || this.state.progress !== 'setup'}
-              onClick={ () => {
+          <ActionButtons
+            progress={this.state.progress}
+            currentPlayer={currentPlayer}
+            betAction={
+              () => this.setState(
+                {
+                  chip: this.state.chip - 50,
+                  players: [currentPlayer.addBet(50)]
+                }
+              )
+            }
+            startAction={
+              () => {
                 this.setState(this.setup(this.state.chip, currentPlayer))
-              }}
-            />
-            <Button
-              text="Hit"
-              disabled={this.state.progress !== 'start'}
-              onClick={ () => this.hitAction(currentPlayer, dealer) }
-            />
-            <Button
-              text="Double"
-              disabled={this.state.progress !== 'start'}
-              onClick={ () => this.doubleAction(currentPlayer, dealer) }
-            />
-            <Button
-              text="Split"
-              disabled={(this.state.progress === 'finish' || !currentPlayer.isSplitEnable())}
-              onClick={ () => {this.splitAction(currentPlayer)} }
-            />
-            <Button
-              text="Stay"
-              disabled={this.state.progress !== 'start'}
-              onClick={() => {this.stayAction(dealer, this.state.players, this.state.currentPlayerIndex)}}
-            />
-            <Button
-              text="Restart"
-              disabled={this.state.progress !== 'finish'}
-              onClick={() => {
+              }
+            }
+            hitAction={
+              () => this.hitAction(currentPlayer, dealer)
+            }
+            doubleAction={
+              () => this.doubleAction(currentPlayer, dealer)
+            }
+            splitAction={
+              () => {this.splitAction(currentPlayer)}
+            }
+            stayAction={
+              () => {
+                this.stayAction(
+                  dealer, this.state.players, this.state.currentPlayerIndex
+                )
+              }
+            }
+            restartAction={
+              () => {
                 const playersChip = this.state.players.reduce((sum, player) => {
                   return (sum + player.totalReturnAmount())
                 }, this.state.chip)
                 this.setState(this.setup(playersChip, new Player()))
-              }}
-            />
-          </div>
+              }
+            }
+          />
         </div>
       </div>
     )
