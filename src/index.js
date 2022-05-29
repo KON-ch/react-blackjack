@@ -228,21 +228,11 @@ class Game extends React.Component {
             <div className="dealer-score">Dealer: { this.state.progress === 'finish' ?  dealer.score.value() : '---' }</div>
             <HandCards role="dealer-hand" cards={dealer.displayHand()} deck={this.state.deck} />
           </div>
-          <div className="player">
-            {
-              displayPlayers.map((player, index) => {
-                const currentField = player === currentPlayer ? 'current-field' : ''
-                return (
-                  <PlayerField
-                    currentField={currentField}
-                    player={player}
-                    deck={this.state.deck}
-                    key={index}
-                  />
-                )
-              })
-            }
-          </div>
+          <PlayerField
+            deck={this.state.deck}
+            players={displayPlayers}
+            currentPlayer={currentPlayer}
+          />
           <div className="action">
             <button
               className="button bet-button"
