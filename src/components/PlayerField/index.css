@@ -1,0 +1,17 @@
+.player-field {
+  height: 350px;
+  min-width: 350px;
+}
+
+.current-field {
+  background-color: #f4fff4;
+}
+
+.player-score {
+  font-size: 32px;
+}
+
+.player-chips {
+  display: flex;
+  justify-content: center;
+}

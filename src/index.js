@@ -8,8 +8,9 @@ import { Dealer } from "./dealer";
 import { Player } from "./player";
 
 // Component
-import { HandCards } from "./components/HandCards";
 import { Chip } from "./components/Chip";
+import { HandCards } from "./components/HandCards";
+import { PlayerField } from "./components/PlayerField";
 
 // JSON
 import defaultDeck from './deck.json'
@@ -231,17 +232,13 @@ class Game extends React.Component {
             {
               displayPlayers.map((player, index) => {
                 const currentField = player === currentPlayer ? 'current-field' : ''
-
                 return (
-                  <div className={`player-field ${currentField}`} key={index}>
-                    <div className="player-score">Player: { player.score.value() }</div>
-                    <HandCards role="player-hand" cards={player.displayHand()} deck={this.state.deck} />
-                    <div className="player-chips">
-                      <Chip chip={player.rewardAmount()} role="reward-chip" />
-                      <Chip chip={player.betAmount()} role="player-bet" />
-                      <Chip chip={player.doubleDownAmount()} role="double-down-bet" />
-                    </div>
-                  </div>
+                  <PlayerField
+                    currentField={currentField}
+                    player={player}
+                    deck={this.state.deck}
+                    key={index}
+                  />
                 )
               })
             }
