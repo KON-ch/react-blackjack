@@ -5,11 +5,11 @@ export class Bet {
   }
 
   add(amount) {
-    new Bet(this.amount + amount)
+    return new Bet(this.amount + amount)
   }
 
   remove() {
-    new Bet(0)
+    return new Bet(0)
   }
 
   isZero() {
@@ -17,7 +17,7 @@ export class Bet {
   }
 
   doubleDown() {
-    new Bet(this.amount, this.amount)
+    return new Bet(this.amount, this.amount)
   }
 
   totalAmount() {

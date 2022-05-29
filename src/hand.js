@@ -25,7 +25,11 @@ export class Hand {
   }
 
   isTwoAce() {
-    (this.cards.length === 2 && this.cards.every((card) => { return (card.number === 1) }))
+    if (this.cards.length !== 2) { return false }
+
+    this.cards.every((card) => {
+      return (card.number === 1)
+    })
   }
 }
 

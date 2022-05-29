@@ -1,28 +1,37 @@
 import { CalculateScore } from "./calculate_score"
+import { Hand } from "./hand"
 
 export class Dealer {
-  constructor(hand) {
+  constructor(hand = new Hand([])) {
     this.hand = hand
     this.score = new CalculateScore(hand.cards)
   }
 
   cardFaceUp() {
-    new Dealer(this.hand.cardFaceUp())
+    return new Dealer(this.hand.cardFaceUp())
+  }
+
+  setupCard(cards) {
+    return new Dealer(new Hand(cards).cardFaceDown(), this.bet, this.reward)
   }
 
   isMustHit() {
-    this.score.isMustHit()
+    return this.score.isMustHit()
   }
 
   addCard(card) {
-    new Dealer(this.hand.addCard(card))
+    return new Dealer(this.hand.addCard(card))
   }
 
   isBlackJack() {
-    this.score.isBlackJack()
+    return this.score.isBlackJack()
+  }
+
+  isBurst() {
+    return this.score.isBurst()
   }
 
   displayHand() {
-    this.hand.display()
+    return this.hand.display()
   }
 }

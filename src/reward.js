@@ -4,6 +4,6 @@ export class Reward {
   }
 
   add(amount) {
-    new Reward(this.amount + amount)
+    return new Reward(this.amount + amount)
   }
 }
