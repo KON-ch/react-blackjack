@@ -1,13 +1,16 @@
 import React from "react";
 import './index.css'
+import { Card } from './Card'
 
 export class HandCards extends React.Component {
   render() {
     const handCards = this.props.cards.map((card) => {
-      return(
-        <span style={{ color: this.props.deck.suitColor(card) }} key={card.displayCode}>
-          { String.fromCodePoint(card.displayCode) }
-        </span>
+      return (
+        <Card
+          card={card}
+          color={this.props.deck.suitColor(card)}
+          key={card.displayCode}
+        />
       )
     })
 
