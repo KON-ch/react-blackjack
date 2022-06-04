@@ -1,30 +1,36 @@
 import defaultDeck from './deck.json'
 
 export class Deck {
-  constructor() {
-    // 52枚のカードで毎回開始できるようにディープコピーしている
-    this.cards = JSON.parse(JSON.stringify((defaultDeck))).cards
+  static DEFAULT_CARDS = defaultDeck.cards
+
+  constructor(cards = this.shuffle(Deck.DEFAULT_CARDS)) {
+    this.cards = cards
   }
 
   setup() {
-    const playerCard1 = this.drawCard()
-    const dealerCard1 = this.drawCard()
-    const playerCard2 = this.drawCard()
-    const dealerCard2 = this.drawCard()
+    const [playerCard1, deck1] = this.drawCard()
+    const [dealerCard1, deck2] = deck1.drawCard()
+    const [playerCard2, deck3] = deck2.drawCard()
+    const [dealerCard2, startDeck] = deck3.drawCard()
 
     return {
-      startDeck: this,
+      startDeck: startDeck,
       playerCards: [playerCard1, playerCard2],
       dealerCards: [dealerCard1, dealerCard2]
     }
   }
 
   drawCard() {
-    // FIXME: 破壊的
-    return this.cards.splice(this.#randomNumber(this.cards.length), 1)[0]
+    const newCards = this.cards.slice(1)
+
+    return [this.cards[0], new Deck(newCards)]
   }
 
-  #randomNumber(totalCount) {
-    return Math.floor(Math.random() * totalCount - 1) + 1
+  shuffle([...array]) {
+    for (let i = array.length - 1; i >= 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 }

@@ -77,7 +77,7 @@ class Game extends React.Component {
   }
 
   hitAction(currentPlayer, dealer) {
-    const newCard = this.state.deck.drawCard()
+    const [newCard, newDeck] = this.state.deck.drawCard()
     const newPlayer = currentPlayer.addCard(newCard)
 
     const newPlayers = this.state.players.map((player) => {
@@ -87,7 +87,7 @@ class Game extends React.Component {
       return newPlayer.isBurst() ? newPlayer.removeBet() : newPlayer
     })
 
-    this.setState({ players: newPlayers })
+    this.setState({ deck: newDeck, players: newPlayers })
 
     if(newPlayer.isBurst()) {
       if (this.state.currentPlayerIndex < (this.state.players.length - 1)) {
@@ -101,7 +101,7 @@ class Game extends React.Component {
         })
       }
 
-      this.stayAction(dealer, newPlayers, this.state.currentPlayerIndex)
+      this.stayAction(newDeck, dealer, newPlayers, this.state.currentPlayerIndex)
     }
   }
 
@@ -119,19 +119,26 @@ class Game extends React.Component {
 
     if (!currentPlayer.isTwoAce()) { return }
 
+    const [addCard1, deck1] = this.state.deck.drawCard()
+    const [addCard2, newDeck] = deck1.drawCard()
+
+    const addCards = [addCard1, addCard2]
+    let addCounter = -1
+
     const finishPlayers = newPlayers.map((player) => {
-      const newCard = this.state.deck.drawCard()
-      return player.addCard(newCard)
+      if (player.hand.cards.length !== 1) { return player }
+
+      return player.addCard(addCards[addCounter += 1])
     })
 
-    this.stayAction(this.state.dealer, finishPlayers, finishPlayers.length)
+    this.stayAction(newDeck, this.state.dealer, finishPlayers, finishPlayers.length)
   }
 
   async doubleAction(currentPlayer, dealer) {
     const doubleDownPlayer = currentPlayer.doubleDown()
     const chip = this.state.chip - doubleDownPlayer.betAmount()
 
-    const newCard = this.state.deck.drawCard()
+    const [newCard, newDeck] = this.state.deck.drawCard()
     const newPlayer = doubleDownPlayer.addCard(newCard)
 
     const newPlayers = this.state.players.map((player) => {
@@ -140,7 +147,7 @@ class Game extends React.Component {
       return newPlayer.isBurst() ? newPlayer.removeBet() : newPlayer
     })
 
-    this.setState({ chip: chip, players: newPlayers })
+    this.setState({ deck: newDeck, chip: chip, players: newPlayers })
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
@@ -160,19 +167,19 @@ class Game extends React.Component {
       }
     }
 
-    this.stayAction(dealer, newPlayers, this.state.currentPlayerIndex)
+    this.stayAction(newDeck, dealer, newPlayers, this.state.currentPlayerIndex)
   }
 
-  stayAction(dealer, players, currentPlayerIndex) {
+  stayAction(deck, dealer, players, currentPlayerIndex) {
     if (currentPlayerIndex < (players.length - 1)) {
       return this.setState({ currentPlayerIndex: currentPlayerIndex + 1 })
     }
 
     if (dealer.isMustHit()) {
-      const newCard = this.state.deck.drawCard()
+      const [newCard, newDeck] = deck.drawCard()
       const newDealer = dealer.addCard(newCard)
 
-      this.setState({ dealer: newDealer })
+      this.setState({ deck: newDeck, dealer: newDealer })
 
       if (newDealer.isBurst()) {
         return this.setState({
@@ -183,7 +190,7 @@ class Game extends React.Component {
         })
       }
 
-      return this.stayAction(newDealer, players, currentPlayerIndex)
+      return this.stayAction(newDeck, newDealer, players, currentPlayerIndex)
     }
 
     const evaluatedPlayers = players.map((player) => {
@@ -256,7 +263,7 @@ class Game extends React.Component {
             stayAction={
               () => {
                 this.stayAction(
-                  dealer, this.state.players, this.state.currentPlayerIndex
+                  this.state.deck, dealer, this.state.players, this.state.currentPlayerIndex
                 )
               }
             }
