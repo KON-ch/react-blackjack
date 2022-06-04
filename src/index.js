@@ -19,9 +19,7 @@ const container = document.getElementById('root');
 const root = createRoot(container)
 
 class Game extends React.Component {
-  setup(chip, player) {
-    const deck = new Deck()
-
+  setup(deck, chip, player) {
     const progress = new Progress()
 
     // 1. no bet
@@ -73,7 +71,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = this.setup(1000, new Player())
+    this.state = this.setup(new Deck(), 1000, new Player())
   }
 
   hitAction(currentPlayer, dealer) {
@@ -248,7 +246,7 @@ class Game extends React.Component {
             }
             startAction={
               () => {
-                this.setState(this.setup(this.state.chip, currentPlayer))
+                this.setState(this.setup(this.state.deck, this.state.chip, currentPlayer))
               }
             }
             hitAction={
@@ -272,7 +270,7 @@ class Game extends React.Component {
                 const playersChip = this.state.players.reduce((sum, player) => {
                   return (sum + player.totalReturnAmount())
                 }, this.state.chip)
-                this.setState(this.setup(playersChip, new Player()))
+                this.setState(this.setup(new Deck(), playersChip, new Player()))
               }
             }
           />
