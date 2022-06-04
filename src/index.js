@@ -37,14 +37,11 @@ class Game extends React.Component {
     }
 
     // 2. game setup
-    const playerCard1 = deck.drawCard()
-    const dealerCard1 = deck.drawCard()
-    const playerCard2 = deck.drawCard()
-    const dealerCard2 = deck.drawCard()
+    const { startDeck, playerCards, dealerCards } = deck.setup()
 
-    const startPlayer = player.setupCard([playerCard1, playerCard2])
+    const startPlayer = player.setupCard(playerCards)
 
-    const dealer = new Dealer().setupCard([dealerCard1, dealerCard2])
+    const dealer = new Dealer().setupCard(dealerCards)
 
     // 3. game finish blackjack
     if (startPlayer.isBlackJack() || dealer.isBlackJack()) {
@@ -53,7 +50,7 @@ class Game extends React.Component {
       const returnBetPlayer = result.isDealerVictory() ? addedRewardPlayer.removeBet() : addedRewardPlayer
 
       return {
-        deck: deck,
+        deck: startDeck,
         dealer: dealer.cardFaceUp(),
         chip: chip,
         progress: progress.finish(),
@@ -64,7 +61,7 @@ class Game extends React.Component {
 
     // 4. game start
     return {
-      deck: deck,
+      deck: startDeck,
       dealer: dealer,
       chip: chip,
       progress: progress.next(),
@@ -224,7 +221,7 @@ class Game extends React.Component {
         <Chip chip={this.state.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
-            <div className="dealer-score">Dealer: { this.state.progress.isFinish() ?  dealer.score.value() : '---' }</div>
+            <div className="dealer-score">Dealer: { this.state.progress.isFinish() ? dealer.score.value() : '---' }</div>
             <HandCards role="dealer-hand" cards={dealer.displayHand()} />
           </div>
           <PlayerField
