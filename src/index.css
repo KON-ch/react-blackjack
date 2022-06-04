@@ -5,3 +5,19 @@
 .dealer-score {
   font-size: 32px;
 }
+.game-log {
+  position: fixed;
+  top: 180px;
+  left: 75%;
+  color: gray;
+}
+
+.game-log > span {
+  color: purple;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.message {
+  margin-bottom: 8px;
+}

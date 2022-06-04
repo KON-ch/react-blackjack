@@ -1,6 +1,6 @@
 .player {
   text-align: center;
   margin-top: 16px;
+  margin-left: 128px;
   display: flex;
-  justify-content: space-around;
 }

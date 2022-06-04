@@ -30,7 +30,8 @@ class Game extends React.Component {
         chip: chip,
         progress: progress,
         players: [player],
-        currentPlayerIndex: 0
+        currentPlayerIndex: 0,
+        message: 'Game start'
       }
     }
 
@@ -54,6 +55,7 @@ class Game extends React.Component {
         progress: progress.finish(),
         players: [returnBetPlayer],
         currentPlayerIndex: 0,
+        message: 'Game finish'
       }
     }
 
@@ -64,7 +66,8 @@ class Game extends React.Component {
       chip: chip,
       progress: progress.next(),
       players: [startPlayer],
-      currentPlayerIndex: 0
+      currentPlayerIndex: 0,
+      message: `Player ${playerCards[0].number} ${playerCards[0].suit} and ${playerCards[1].number} ${playerCards[1].suit}`
     }
   }
 
@@ -92,7 +95,15 @@ class Game extends React.Component {
         return this.setState(
           {
             log: this.state.log.concat(
-              { ...currentState, ...{ deck: newDeck, players: newPlayers, currentPlayerIndex: currentState.currentPlayerIndex + 1 } }
+              {
+                ...currentState,
+                ...{
+                  deck: newDeck,
+                  players: newPlayers,
+                  currentPlayerIndex: currentState.currentPlayerIndex + 1,
+                  message: `Added ${newCard.number} ${newCard.suit}`,
+                }
+              }
             ),
             current: this.state.log.length
           }
@@ -103,12 +114,24 @@ class Game extends React.Component {
         return this.setState(
           {
             log: this.state.log.concat(
-              {
-                ...currentState,
-                ...{ deck: newDeck, players: newPlayers, dealer: dealer.cardFaceUp(), progress: currentState.progress.finish() }
-              }
+              [
+                {
+                  ...currentState,
+                  ...{ deck: newDeck, players: newPlayers, message: `Added ${newCard.number} ${newCard.suit}` }
+                },
+                {
+                  ...currentState,
+                  ...{
+                    deck: newDeck,
+                    players: newPlayers,
+                    dealer: dealer.cardFaceUp(),
+                    progress: currentState.progress.finish(),
+                    message: `Game finish`
+                  }
+                }
+              ]
             ),
-            current: this.state.log.length
+            current: this.state.log.length + 1
           }
         )
       }
@@ -119,7 +142,10 @@ class Game extends React.Component {
     this.setState(
       {
         log: this.state.log.concat(
-          { ...currentState, ...{ deck: newDeck, players: newPlayers } }
+          {
+            ...currentState,
+            ...{ deck: newDeck, players: newPlayers, message: `Added ${newCard.number} ${newCard.suit}` }
+          }
         ),
         current: this.state.log.length
       }
@@ -139,7 +165,11 @@ class Game extends React.Component {
         log: this.state.log.concat(
           {
             ...currentState,
-            ...{ players: newPlayers, chip: currentState.chip - currentPlayer.betAmount() }
+            ...{
+              players: newPlayers,
+              chip: currentState.chip - currentPlayer.betAmount(),
+              message: 'Player split hand'
+            }
           }
         ),
         current: this.state.log.length
@@ -183,7 +213,14 @@ class Game extends React.Component {
             log: this.state.log.concat(
               {
                 ...currentState,
-                ...{ deck: newDeck, chip: chip, players: newPlayers, currentPlayerIndex: currentState.currentPlayerIndex + 1 } }
+                ...{
+                  deck: newDeck,
+                  chip: chip,
+                  players: newPlayers,
+                  currentPlayerIndex: currentState.currentPlayerIndex + 1,
+                  message: `Added bet ${doubleDownPlayer.betAmount()} points and ${newCard.number} ${newCard.suit}`
+                }
+              }
             ),
             current: this.state.log.length
           }
@@ -194,12 +231,30 @@ class Game extends React.Component {
         return this.setState(
           {
             log: this.state.log.concat(
-              {
-                ...currentState,
-                ...{ dealer: dealer.cardFaceUp(), progress: currentState.progress.finish(), deck: newDeck, chip: chip, players: newPlayers }
-              }
+              [
+                {
+                  ...currentState,
+                  ...{
+                    deck: newDeck,
+                    chip: chip,
+                    players: newPlayers,
+                    message: `Added bet ${doubleDownPlayer.betAmount()} points and ${newCard.number} ${newCard.suit}`
+                  }
+                },
+                {
+                  ...currentState,
+                  ...{
+                    dealer: dealer.cardFaceUp(),
+                    progress: currentState.progress.finish(),
+                    deck: newDeck,
+                    chip: chip,
+                    players: newPlayers,
+                    message: 'Game finish'
+                  }
+                }
+              ]
             ),
-            current: this.state.log.length
+            current: this.state.log.length + 1
           }
         )
       }
@@ -210,7 +265,12 @@ class Game extends React.Component {
         log: this.state.log.concat(
           {
             ...currentState,
-            ...{ deck: newDeck, chip: chip, players: newPlayers }
+            ...{
+              deck: newDeck,
+              chip: chip,
+              players: newPlayers,
+              message: `Added bet ${doubleDownPlayer.betAmount()} points and ${newCard.number} ${newCard.suit}`
+            }
           }
         ),
         current: this.state.log.length
@@ -230,7 +290,10 @@ class Game extends React.Component {
       return this.setState(
         {
           log: this.state.log.concat(
-            { ...currentState, ...{ currentPlayerIndex: currentPlayerIndex + 1} }
+            {
+              ...currentState,
+              ...{ currentPlayerIndex: currentPlayerIndex + 1, message: 'next player turn' }
+            }
           ),
           current: this.state.log.length
         }
@@ -253,7 +316,8 @@ class Game extends React.Component {
                   progress: currentState.progress.finish(),
                   players: players.map((player) => {
                     return player.addReward()
-                  })
+                  }),
+                  message: 'Game finish'
                 }
               }
             ),
@@ -261,15 +325,6 @@ class Game extends React.Component {
           }
         )
       }
-
-      this.setState(
-        {
-          log: this.state.log.concat(
-            { ...currentState, ...{ deck: newDeck, dealer: newDealer } }
-          ),
-          current: this.state.log.length
-        }
-      )
 
       return this.stayAction(newDeck, newDealer, players, currentPlayerIndex)
     }
@@ -297,7 +352,8 @@ class Game extends React.Component {
               deck: deck,
               dealer: dealer.cardFaceUp(),
               progress: currentState.progress.finish(),
-              players: evaluatedPlayers
+              players: evaluatedPlayers,
+              message: 'Game finish'
             }
           }
         ),
@@ -338,7 +394,7 @@ class Game extends React.Component {
                   log: this.state.log.concat(
                     {
                       ...currentState,
-                      ...{ chip: currentState.chip - 50, players: [currentPlayer.addBet(50)] }
+                      ...{ chip: currentState.chip - 50, players: [currentPlayer.addBet(50)], message: 'Added bet 50 points' }
                     }
                   ),
                   current: this.state.log.length
@@ -385,6 +441,14 @@ class Game extends React.Component {
               }
             }
           />
+        </div>
+        <div className="game-log">
+          <span>Game Log</span>
+          {
+            this.state.log.map((log, index) => {
+              return (<div className="message" key={index}>{index}. {log.message}</div>)
+            })
+          }
         </div>
       </div>
     )
