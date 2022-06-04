@@ -446,9 +446,10 @@ class Game extends React.Component {
           <span>Game Log</span>
           {
             this.state.log.map((log, index) => {
+              const current = this.state.current === index ? 'current' : ''
               return (
                 <button
-                  className="message"
+                  className={`message ${current}`}
                   key={index}
                   onClick={
                     () => { this.setState( { current: index }) }
