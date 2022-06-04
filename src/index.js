@@ -446,7 +446,17 @@ class Game extends React.Component {
           <span>Game Log</span>
           {
             this.state.log.map((log, index) => {
-              return (<div className="message" key={index}>{index}. {log.message}</div>)
+              return (
+                <button
+                  className="message"
+                  key={index}
+                  onClick={
+                    () => { this.setState( { current: index }) }
+                  }
+                >
+                  {index}. {log.message}
+                </button>
+              )
             })
           }
         </div>
