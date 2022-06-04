@@ -71,53 +71,82 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = this.setup(new Deck(), 1000, new Player())
+    this.state = { log: [this.setup(new Deck(), 1000, new Player())], current: 0 }
   }
 
   hitAction(currentPlayer, dealer) {
-    const [newCard, newDeck] = this.state.deck.drawCard()
+    const currentState = this.state.log[this.state.current]
+
+    const [newCard, newDeck] = currentState.deck.drawCard()
     const newPlayer = currentPlayer.addCard(newCard)
 
-    const newPlayers = this.state.players.map((player) => {
+    const newPlayers = currentState.players.map((player) => {
       if (player !== currentPlayer) {
         return player
       }
       return newPlayer.isBurst() ? newPlayer.removeBet() : newPlayer
     })
 
-    this.setState({ deck: newDeck, players: newPlayers })
-
     if(newPlayer.isBurst()) {
-      if (this.state.currentPlayerIndex < (this.state.players.length - 1)) {
-        return this.setState({ currentPlayerIndex: this.state.currentPlayerIndex + 1 })
+      if (currentState.currentPlayerIndex < (currentState.players.length - 1)) {
+        return this.setState(
+          {
+            log: this.state.log.concat(
+              { ...currentState, ...{ deck: newDeck, players: newPlayers, currentPlayerIndex: currentState.currentPlayerIndex + 1 } }
+            ),
+            current: this.state.log.length
+          }
+        )
       }
 
       if (newPlayers.every((player) => { return (!player.hasBet()) })) {
-        return this.setState({
-          dealer: dealer.cardFaceUp(),
-          progress: this.state.progress.finish(),
-        })
+        return this.setState(
+          {
+            log: this.state.log.concat(
+              {
+                ...currentState,
+                ...{ deck: newDeck, players: newPlayers, dealer: dealer.cardFaceUp(), progress: currentState.progress.finish() }
+              }
+            ),
+            current: this.state.log.length
+          }
+        )
       }
 
-      this.stayAction(newDeck, dealer, newPlayers, this.state.currentPlayerIndex)
+      this.stayAction(newDeck, dealer, newPlayers, currentState.currentPlayerIndex)
     }
+
+    this.setState(
+      {
+        log: this.state.log.concat(
+          { ...currentState, ...{ deck: newDeck, players: newPlayers } }
+        ),
+        current: this.state.log.length
+      }
+    )
   }
 
   splitAction(currentPlayer) {
-    const  newPlayers = this.state.players.map((player) => {
+    const currentState = this.state.log[this.state.current]
+    const  newPlayers = currentState.players.map((player) => {
       if(player !== currentPlayer) { return player }
 
       return player.splitHand()
     }).flat()
 
-    this.setState({
-      chip: this.state.chip - currentPlayer.betAmount(),
-      players: newPlayers
-    })
+    if (!currentPlayer.isTwoAce()) {
+      return this.setState({
+        log: this.state.log.concat(
+          {
+            ...currentState,
+            ...{ players: newPlayers, chip: currentState.chip - currentPlayer.betAmount() }
+          }
+        ),
+        current: this.state.log.length
+      })
+    }
 
-    if (!currentPlayer.isTwoAce()) { return }
-
-    const [addCard1, deck1] = this.state.deck.drawCard()
+    const [addCard1, deck1] = currentState.deck.drawCard()
     const [addCard2, newDeck] = deck1.drawCard()
 
     const addCards = [addCard1, addCard2]
@@ -129,64 +158,118 @@ class Game extends React.Component {
       return player.addCard(addCards[addCounter += 1])
     })
 
-    this.stayAction(newDeck, this.state.dealer, finishPlayers, finishPlayers.length)
+    this.stayAction(newDeck, currentState.dealer, finishPlayers, finishPlayers.length)
   }
 
   async doubleAction(currentPlayer, dealer) {
-    const doubleDownPlayer = currentPlayer.doubleDown()
-    const chip = this.state.chip - doubleDownPlayer.betAmount()
+    const currentState = this.state.log[this.state.current]
 
-    const [newCard, newDeck] = this.state.deck.drawCard()
+    const doubleDownPlayer = currentPlayer.doubleDown()
+    const chip = currentState.chip - doubleDownPlayer.betAmount()
+
+    const [newCard, newDeck] = currentState.deck.drawCard()
     const newPlayer = doubleDownPlayer.addCard(newCard)
 
-    const newPlayers = this.state.players.map((player) => {
+    const newPlayers = currentState.players.map((player) => {
       if (player !== currentPlayer) { return player }
 
       return newPlayer.isBurst() ? newPlayer.removeBet() : newPlayer
     })
 
-    this.setState({ deck: newDeck, chip: chip, players: newPlayers })
+    if(newPlayer.isBurst()) {
+      if (currentState.currentPlayerIndex < (currentState.players.length - 1)) {
+        return this.setState(
+          {
+            log: this.state.log.concat(
+              {
+                ...currentState,
+                ...{ deck: newDeck, chip: chip, players: newPlayers, currentPlayerIndex: currentState.currentPlayerIndex + 1 } }
+            ),
+            current: this.state.log.length
+          }
+        )
+      }
+
+      if (newPlayers.every((player) => { return (!player.hasBet()) })) {
+        return this.setState(
+          {
+            log: this.state.log.concat(
+              {
+                ...currentState,
+                ...{ dealer: dealer.cardFaceUp(), progress: currentState.progress.finish(), deck: newDeck, chip: chip, players: newPlayers }
+              }
+            ),
+            current: this.state.log.length
+          }
+        )
+      }
+    }
+
+    this.setState(
+      {
+        log: this.state.log.concat(
+          {
+            ...currentState,
+            ...{ deck: newDeck, chip: chip, players: newPlayers }
+          }
+        ),
+        current: this.state.log.length
+      }
+    )
 
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await _sleep(300);
 
-    if(newPlayer.isBurst()) {
-      if (this.state.currentPlayerIndex < (this.state.players.length - 1)) {
-        return this.setState({
-          currentPlayerIndex: this.state.currentPlayerIndex + 1
-        })
-      }
-
-      if (newPlayers.every((player) => { return (!player.hasBet()) })) {
-        return this.setState({
-          dealer: dealer.cardFaceUp(),
-          progress: this.state.progress.finish(),
-        })
-      }
-    }
-
-    this.stayAction(newDeck, dealer, newPlayers, this.state.currentPlayerIndex)
+    this.stayAction(newDeck, dealer, newPlayers, currentState.currentPlayerIndex)
   }
 
   stayAction(deck, dealer, players, currentPlayerIndex) {
+    const currentState = this.state.log[this.state.current]
+
     if (currentPlayerIndex < (players.length - 1)) {
-      return this.setState({ currentPlayerIndex: currentPlayerIndex + 1 })
+      return this.setState(
+        {
+          log: this.state.log.concat(
+            { ...currentState, ...{ currentPlayerIndex: currentPlayerIndex + 1} }
+          ),
+          current: this.state.log.length
+        }
+      )
     }
 
     if (dealer.isMustHit()) {
       const [newCard, newDeck] = deck.drawCard()
       const newDealer = dealer.addCard(newCard)
 
-      this.setState({ deck: newDeck, dealer: newDealer })
-
       if (newDealer.isBurst()) {
-        return this.setState({
-          progress: this.state.progress.finish(),
-          players: players.map((player) => {
-            return player.addReward()
-          })
-        })
+        return this.setState(
+          {
+            log: this.state.log.concat(
+              {
+                ...currentState,
+                ...{
+                  deck: newDeck,
+                  dealer: newDealer,
+                  progress: currentState.progress.finish(),
+                  players: players.map((player) => {
+                    return player.addReward()
+                  })
+                }
+              }
+            ),
+            current: this.state.log.length
+          }
+        )
       }
+
+      this.setState(
+        {
+          log: this.state.log.concat(
+            { ...currentState, ...{ deck: newDeck, dealer: newDealer } }
+          ),
+          current: this.state.log.length
+        }
+      )
 
       return this.stayAction(newDeck, newDealer, players, currentPlayerIndex)
     }
@@ -205,28 +288,41 @@ class Game extends React.Component {
       return player
     })
 
-    this.setState({
-      dealer: dealer.cardFaceUp(),
-      progress: this.state.progress.finish(),
-      players: evaluatedPlayers
-    })
+    this.setState(
+      {
+        log: this.state.log.concat(
+          {
+            ...currentState,
+            ...{
+              deck: deck,
+              dealer: dealer.cardFaceUp(),
+              progress: currentState.progress.finish(),
+              players: evaluatedPlayers
+            }
+          }
+        ),
+        current: this.state.log.length
+      }
+    )
   }
 
   render() {
+    const currentState = this.state.log[this.state.current]
+
     // Dealer
-    const dealer = this.state.dealer
+    const dealer = currentState.dealer
 
     // Player
-    const currentPlayer = this.state.players[this.state.currentPlayerIndex]
+    const currentPlayer = currentState.players[currentState.currentPlayerIndex]
     // 右側のプレイヤーからアクションを行う為、表示順を反転している
-    const displayPlayers = [...this.state.players].reverse()
+    const displayPlayers = [...currentState.players].reverse()
 
     return (
       <div className="game">
-        <Chip chip={this.state.chip} role="game-chip" />
+        <Chip chip={currentState.chip} role="game-chip" />
         <div className="game-board">
           <div className="dealer">
-            <div className="dealer-score">Dealer: { this.state.progress.isFinish() ? dealer.score.value() : '---' }</div>
+            <div className="dealer-score">Dealer: { currentState.progress.isFinish() ? dealer.score.value() : '---' }</div>
             <HandCards role="dealer-hand" cards={dealer.displayHand()} />
           </div>
           <PlayerField
@@ -234,19 +330,29 @@ class Game extends React.Component {
             currentPlayer={currentPlayer}
           />
           <ActionButtons
-            progress={this.state.progress}
+            progress={currentState.progress}
             currentPlayer={currentPlayer}
             betAction={
               () => this.setState(
                 {
-                  chip: this.state.chip - 50,
-                  players: [currentPlayer.addBet(50)]
+                  log: this.state.log.concat(
+                    {
+                      ...currentState,
+                      ...{ chip: currentState.chip - 50, players: [currentPlayer.addBet(50)] }
+                    }
+                  ),
+                  current: this.state.log.length
                 }
               )
             }
             startAction={
               () => {
-                this.setState(this.setup(this.state.deck, this.state.chip, currentPlayer))
+                this.setState(
+                  {
+                    log: this.state.log.concat(this.setup(currentState.deck, currentState.chip, currentPlayer)),
+                    current: this.state.log.length
+                  }
+                )
               }
             }
             hitAction={
@@ -261,16 +367,21 @@ class Game extends React.Component {
             stayAction={
               () => {
                 this.stayAction(
-                  this.state.deck, dealer, this.state.players, this.state.currentPlayerIndex
+                  currentState.deck, dealer, currentState.players, currentState.currentPlayerIndex
                 )
               }
             }
             restartAction={
               () => {
-                const playersChip = this.state.players.reduce((sum, player) => {
+                const playersChip = currentState.players.reduce((sum, player) => {
                   return (sum + player.totalReturnAmount())
-                }, this.state.chip)
-                this.setState(this.setup(new Deck(), playersChip, new Player()))
+                }, currentState.chip)
+                this.setState(
+                  {
+                    log: [this.setup(new Deck(), playersChip, new Player())],
+                    current: 0
+                  }
+                )
               }
             }
           />
