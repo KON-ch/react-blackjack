@@ -94,7 +94,7 @@ class Game extends React.Component {
       if (currentState.currentPlayerIndex < (currentState.players.length - 1)) {
         return this.setState(
           {
-            log: this.state.log.concat(
+            log: this.state.log.slice(0, this.state.current + 1).concat(
               {
                 ...currentState,
                 ...{
@@ -105,7 +105,7 @@ class Game extends React.Component {
                 }
               }
             ),
-            current: this.state.log.length
+            current: this.state.current + 1
           }
         )
       }
@@ -113,7 +113,7 @@ class Game extends React.Component {
       if (newPlayers.every((player) => { return (!player.hasBet()) })) {
         return this.setState(
           {
-            log: this.state.log.concat(
+            log: this.state.log.slice(0, this.state.current + 1).concat(
               [
                 {
                   ...currentState,
@@ -131,7 +131,7 @@ class Game extends React.Component {
                 }
               ]
             ),
-            current: this.state.log.length + 1
+            current: this.state.current + 2
           }
         )
       }
@@ -141,13 +141,13 @@ class Game extends React.Component {
 
     this.setState(
       {
-        log: this.state.log.concat(
+        log: this.state.log.slice(0, this.state.current + 1).concat(
           {
             ...currentState,
             ...{ deck: newDeck, players: newPlayers, message: `Added ${newCard.number} ${newCard.suit}` }
           }
         ),
-        current: this.state.log.length
+        current: this.state.current + 1
       }
     )
   }
@@ -162,7 +162,7 @@ class Game extends React.Component {
 
     if (!currentPlayer.isTwoAce()) {
       return this.setState({
-        log: this.state.log.concat(
+        log: this.state.log.slice(0, this.state.current + 1).concat(
           {
             ...currentState,
             ...{
@@ -172,7 +172,7 @@ class Game extends React.Component {
             }
           }
         ),
-        current: this.state.log.length
+        current: this.state.current + 1
       })
     }
 
@@ -210,7 +210,7 @@ class Game extends React.Component {
       if (currentState.currentPlayerIndex < (currentState.players.length - 1)) {
         return this.setState(
           {
-            log: this.state.log.concat(
+            log: this.state.log.slice(0, this.state.current + 1).concat(
               {
                 ...currentState,
                 ...{
@@ -222,7 +222,7 @@ class Game extends React.Component {
                 }
               }
             ),
-            current: this.state.log.length
+            current: this.state.current + 1
           }
         )
       }
@@ -230,7 +230,7 @@ class Game extends React.Component {
       if (newPlayers.every((player) => { return (!player.hasBet()) })) {
         return this.setState(
           {
-            log: this.state.log.concat(
+            log: this.state.log.slice(0, this.state.current + 1).concat(
               [
                 {
                   ...currentState,
@@ -254,7 +254,7 @@ class Game extends React.Component {
                 }
               ]
             ),
-            current: this.state.log.length + 1
+            current: this.state.current + 2
           }
         )
       }
@@ -262,7 +262,7 @@ class Game extends React.Component {
 
     this.setState(
       {
-        log: this.state.log.concat(
+        log: this.state.log.slice(0, this.state.current + 1).concat(
           {
             ...currentState,
             ...{
@@ -273,7 +273,7 @@ class Game extends React.Component {
             }
           }
         ),
-        current: this.state.log.length
+        current: this.state.current + 1
       }
     )
 
@@ -289,13 +289,13 @@ class Game extends React.Component {
     if (currentPlayerIndex < (players.length - 1)) {
       return this.setState(
         {
-          log: this.state.log.concat(
+          log: this.state.log.slice(0, this.state.current + 1).concat(
             {
               ...currentState,
               ...{ currentPlayerIndex: currentPlayerIndex + 1, message: 'next player turn' }
             }
           ),
-          current: this.state.log.length
+          current: this.state.current + 1
         }
       )
     }
@@ -307,7 +307,7 @@ class Game extends React.Component {
       if (newDealer.isBurst()) {
         return this.setState(
           {
-            log: this.state.log.concat(
+            log: this.state.log.slice(0, this.state.current + 1).concat(
               {
                 ...currentState,
                 ...{
@@ -321,7 +321,7 @@ class Game extends React.Component {
                 }
               }
             ),
-            current: this.state.log.length
+            current: this.state.current + 1
           }
         )
       }
@@ -345,7 +345,7 @@ class Game extends React.Component {
 
     this.setState(
       {
-        log: this.state.log.concat(
+        log: this.state.log.slice(0, this.state.current + 1).concat(
           {
             ...currentState,
             ...{
@@ -357,7 +357,7 @@ class Game extends React.Component {
             }
           }
         ),
-        current: this.state.log.length
+        current: this.state.current + 1
       }
     )
   }
@@ -391,13 +391,13 @@ class Game extends React.Component {
             betAction={
               () => this.setState(
                 {
-                  log: this.state.log.concat(
+                  log: this.state.log.slice(0, this.state.current + 1).concat(
                     {
                       ...currentState,
                       ...{ chip: currentState.chip - 50, players: [currentPlayer.addBet(50)], message: 'Added bet 50 points' }
                     }
                   ),
-                  current: this.state.log.length
+                  current: this.state.current + 1
                 }
               )
             }
@@ -405,8 +405,8 @@ class Game extends React.Component {
               () => {
                 this.setState(
                   {
-                    log: this.state.log.concat(this.setup(currentState.deck, currentState.chip, currentPlayer)),
-                    current: this.state.log.length
+                    log: this.state.log.slice(0, this.state.current + 1).concat(this.setup(currentState.deck, currentState.chip, currentPlayer)),
+                    current: this.state.current + 1
                   }
                 )
               }
