@@ -388,6 +388,7 @@ class Game extends React.Component {
           <ActionButtons
             progress={currentState.progress}
             currentPlayer={currentPlayer}
+            chipIsInsufficient={currentState.chip < 50}
             betAction={
               () => this.setState(
                 {

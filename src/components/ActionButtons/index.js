@@ -11,7 +11,7 @@ export class ActionButtons extends React.Component {
       <div className="action">
         <Button
           text="Bet"
-          disabled={!progress.isSetup()}
+          disabled={!progress.isSetup() || this.props.chipIsInsufficient}
           action={this.props.betAction}
         />
         <Button
@@ -26,7 +26,7 @@ export class ActionButtons extends React.Component {
         />
         <Button
           text="Double"
-          disabled={progress.isSetup() || progress.isFinish()}
+          disabled={progress.isSetup() || progress.isFinish() || this.props.chipIsInsufficient}
           action={this.props.doubleAction}
         />
         <Button
