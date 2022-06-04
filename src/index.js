@@ -101,7 +101,7 @@ class Game extends React.Component {
                   deck: newDeck,
                   players: newPlayers,
                   currentPlayerIndex: currentState.currentPlayerIndex + 1,
-                  message: `Added ${newCard.number} ${newCard.suit}`,
+                  message: `Added ${newCard.number} of ${newCard.suit}`,
                 }
               }
             ),
@@ -117,7 +117,7 @@ class Game extends React.Component {
               [
                 {
                   ...currentState,
-                  ...{ deck: newDeck, players: newPlayers, message: `Added ${newCard.number} ${newCard.suit}` }
+                  ...{ deck: newDeck, players: newPlayers, message: `Added ${newCard.number} of ${newCard.suit}` }
                 },
                 {
                   ...currentState,
@@ -144,7 +144,7 @@ class Game extends React.Component {
         log: this.state.log.slice(0, this.state.current + 1).concat(
           {
             ...currentState,
-            ...{ deck: newDeck, players: newPlayers, message: `Added ${newCard.number} ${newCard.suit}` }
+            ...{ deck: newDeck, players: newPlayers, message: `Added ${newCard.number} of ${newCard.suit}` }
           }
         ),
         current: this.state.current + 1
